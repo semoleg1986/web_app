@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Curs">
+  <rect width="512" height="512" rx="96" fill="#157a8a"/>
+  <path d="M106 352V160h54l64 117V160h54v192h-54l-64-118v118h-54zm219 0V160h54v192h-54z" fill="#ffffff"/>
+</svg>

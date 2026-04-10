@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Curs Platform OG Image">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#157a8a" />
+      <stop offset="100%" stop-color="#0a4f58" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect x="80" y="88" width="1040" height="454" rx="34" fill="#ffffff" opacity="0.95" />
+  <text x="128" y="270" font-size="78" font-weight="700" font-family="Arial, sans-serif" fill="#124d56">Curs Platform</text>
+  <text x="128" y="340" font-size="34" font-family="Arial, sans-serif" fill="#1f6570">Courses, progress and live classes for families</text>
+</svg>
