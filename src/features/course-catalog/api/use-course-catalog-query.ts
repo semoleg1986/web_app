@@ -1,3 +1,4 @@
+import { useApiQuery } from "~/shared/api/use-api-query";
 import type { CourseCardItem } from '~/features/course-catalog/model/types';
 
 interface CoursesResponse {
@@ -5,5 +6,5 @@ interface CoursesResponse {
 }
 
 export function useCourseCatalogQuery() {
-  return useFetch<CoursesResponse>('/api/courses');
+  return useApiQuery<CoursesResponse>("/courses");
 }

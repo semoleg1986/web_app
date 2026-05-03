@@ -6,6 +6,7 @@ import vueParser from "vue-eslint-parser";
 import eslintConfigPrettier from "eslint-config-prettier";
 
 const nuxtGlobals = {
+  $fetch: "readonly",
   computed: "readonly",
   createError: "readonly",
   defineEventHandler: "readonly",

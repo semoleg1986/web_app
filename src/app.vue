@@ -7,12 +7,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watchEffect } from "vue";
+import { useAuthSession } from "~/features/auth";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppFooter from "~/shared/ui/app-footer/AppFooter.vue";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
 const { init, locale, setLocale, t } = usePreferences();
+const { bootstrap } = useAuthSession();
 
 const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
 const routePath = computed(() =>
@@ -70,6 +72,7 @@ useSeoMeta({
 
 onMounted(() => {
   init();
+  void bootstrap();
 });
 </script>
 
