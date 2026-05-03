@@ -27,6 +27,27 @@ const nuxtGlobals = {
   watchEffect: "readonly"
 };
 
+const restrictedSharedImports = [
+  {
+    group: ["~/app/**", "~/features/**", "~/pages/**", "~/server/**", "~/widgets/**"],
+    message: "shared layer must stay dependency-free from app/pages/widgets/features/server."
+  }
+];
+
+const restrictedFeatureImports = [
+  {
+    group: ["~/app/**", "~/pages/**", "~/server/**", "~/widgets/**"],
+    message: "feature layer may depend only on itself and shared."
+  }
+];
+
+const restrictedWidgetImports = [
+  {
+    group: ["~/app/**", "~/pages/**", "~/server/**"],
+    message: "widget layer may depend on features and shared, but not on pages/app/server."
+  }
+];
+
 export default [
   {
     ignores: [".nuxt/**", ".output/**", "node_modules/**", "coverage/**"]
@@ -62,6 +83,30 @@ export default [
     files: ["src/pages/**/*.vue"],
     rules: {
       "vue/multi-word-component-names": "off"
+    }
+  },
+  {
+    files: ["scripts/**/*.mjs"],
+    rules: {
+      "no-console": "off"
+    }
+  },
+  {
+    files: ["src/shared/**/*.{ts,tsx,js,mjs,cjs,vue}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: restrictedSharedImports }]
+    }
+  },
+  {
+    files: ["src/features/**/*.{ts,tsx,js,mjs,cjs,vue}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: restrictedFeatureImports }]
+    }
+  },
+  {
+    files: ["src/widgets/**/*.{ts,tsx,js,mjs,cjs,vue}"],
+    rules: {
+      "no-restricted-imports": ["error", { patterns: restrictedWidgetImports }]
     }
   },
   eslintConfigPrettier
