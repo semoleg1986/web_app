@@ -6,6 +6,8 @@
     "dev": "nuxt dev --host 0.0.0.0 --port 3000",
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
+    "generate:feature": "node ./scripts/generate-web-slice.mjs --app-dir . --type feature",
+    "generate:widget": "node ./scripts/generate-web-slice.mjs --app-dir . --type widget",
     "test": "vitest run",
     "lint:fast": "oxlint src tests",
     "lint": "npm run lint:fast && eslint .",
