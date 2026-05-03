@@ -7,7 +7,8 @@
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
-    "lint": "eslint .",
+    "lint:fast": "oxlint src tests",
+    "lint": "npm run lint:fast && eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
@@ -24,6 +25,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.29.0",
     "happy-dom": "^15.11.7",
+    "oxlint": "^1.62.0",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4",
     "vue-eslint-parser": "^9.4.3",
