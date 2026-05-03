@@ -16,13 +16,15 @@
 </template>
 
 <script setup lang="ts">
-import { useCourseCatalogQuery } from "~/features/course-catalog/api/use-course-catalog-query";
+import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 
-const { data } = await useCourseCatalogQuery();
+defineProps<{
+  courses: CourseCardItem[];
+}>();
+
 const { t } = usePreferences();
-const courses = computed(() => data.value?.items ?? []);
 </script>
 
 <style scoped>
