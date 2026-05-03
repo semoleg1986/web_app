@@ -7,6 +7,7 @@
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
     "generate:feature": "node ./scripts/generate-web-slice.mjs --app-dir . --type feature",
+    "generate:page": "node ./scripts/generate-web-slice.mjs --app-dir . --type page",
     "generate:widget": "node ./scripts/generate-web-slice.mjs --app-dir . --type widget",
     "test": "vitest run",
     "lint:fast": "oxlint src tests",

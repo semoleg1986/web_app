@@ -52,6 +52,21 @@ function toPascalCase(value) {
     .join("");
 }
 
+function normalizePageRoute(value) {
+  return value
+    .trim()
+    .split("/")
+    .filter(Boolean)
+    .map((segment) => {
+      if (/^\[[^\]]+\]$/.test(segment)) {
+        return segment;
+      }
+
+      return toKebabCase(segment);
+    })
+    .join("/");
+}
+
 function ensureDir(dirPath, dryRun) {
   if (dryRun) {
     console.log(`[dry-run] mkdir -p ${dirPath}`);
@@ -180,21 +195,46 @@ export { default as ${componentName} } from "~/widgets/${sliceName}/ui/${compone
   );
 }
 
+function inferWidgetNameFromPageRoute(routePath) {
+  const segments = routePath.split("/").filter(Boolean);
+  const staticSegments = segments.filter((segment) => !/^\[[^\]]+\]$/.test(segment));
+  const base = staticSegments.at(-1) ?? "page";
+
+  return `${base}-page`;
+}
+
+function createPageSlice({ appDir, pageRoute, widgetName, dryRun }) {
+  const pagesDir = path.join(appDir, "src", "pages");
+  const pageFilePath = path.join(pagesDir, `${pageRoute}.vue`);
+  const widgetSliceName = toKebabCase(widgetName);
+  const widgetComponentName = `${toPascalCase(widgetSliceName)}Widget`;
+
+  ensureDir(path.dirname(pageFilePath), dryRun);
+
+  writeFileSafe(
+    pageFilePath,
+    `<template>
+  <${widgetComponentName} />
+</template>
+
+<script setup lang="ts">
+import { ${widgetComponentName} } from "~/widgets/${widgetSliceName}";
+</script>
+`,
+    dryRun
+  );
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   const appDir = args["app-dir"] ? path.resolve(args["app-dir"]) : process.cwd();
   const sliceType = args.type;
   const rawName = args.name;
   const dryRun = args["dry-run"] === "true";
+  const rawWidgetName = args.widget;
 
   if (!sliceType || !rawName) {
-    fail("Usage: node scripts/generate-web-slice.mjs --app-dir <dir> --type <feature|widget> --name <slice-name> [--dry-run]");
-  }
-
-  const sliceName = toKebabCase(rawName);
-
-  if (!sliceName) {
-    fail("Slice name is empty after normalization.");
+    fail("Usage: node scripts/generate-web-slice.mjs --app-dir <dir> --type <feature|widget|page> --name <slice-name> [--widget <widget-slice>] [--dry-run]");
   }
 
   const srcDir = path.join(appDir, "src");
@@ -204,14 +244,35 @@ function main() {
   }
 
   if (sliceType === "feature") {
+    const sliceName = toKebabCase(rawName);
+
+    if (!sliceName) {
+      fail("Slice name is empty after normalization.");
+    }
+
     createFeatureSlice({ appDir, sliceName, dryRun });
   } else if (sliceType === "widget") {
+    const sliceName = toKebabCase(rawName);
+
+    if (!sliceName) {
+      fail("Slice name is empty after normalization.");
+    }
+
     createWidgetSlice({ appDir, sliceName, dryRun });
+  } else if (sliceType === "page") {
+    const pageRoute = normalizePageRoute(rawName);
+
+    if (!pageRoute) {
+      fail("Page route is empty after normalization.");
+    }
+
+    const widgetName = rawWidgetName ? toKebabCase(rawWidgetName) : inferWidgetNameFromPageRoute(pageRoute);
+    createPageSlice({ appDir, pageRoute, widgetName, dryRun });
   } else {
-    fail(`Unsupported type "${sliceType}". Use "feature" or "widget".`);
+    fail(`Unsupported type "${sliceType}". Use "feature", "widget" or "page".`);
   }
 
-  console.log(`${dryRun ? "[dry-run] " : ""}Generated ${sliceType} slice "${sliceName}" in ${appDir}`);
+  console.log(`${dryRun ? "[dry-run] " : ""}Generated ${sliceType} slice "${rawName}" in ${appDir}`);
 }
 
 main();
