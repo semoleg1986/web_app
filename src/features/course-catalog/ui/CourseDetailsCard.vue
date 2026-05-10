@@ -1,17 +1,18 @@
 <template>
-  <article class="course-card">
+  <AppCard class="course-card">
     <h1>{{ course.title }}</h1>
     <p>{{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}</p>
     <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
     <h2>{{ t("course.description") }}</h2>
     <p class="description">{{ course.description }}</p>
-  </article>
+  </AppCard>
 </template>
 
 <script setup lang="ts">
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
 import type { CourseDetailsItem } from "~/features/course-catalog/model/types";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
+import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
 defineProps<{
   course: CourseDetailsItem;
@@ -22,10 +23,8 @@ const { t } = usePreferences();
 
 <style scoped>
 .course-card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
   padding: 1.25rem;
+  min-height: 100%;
 }
 
 h1 {

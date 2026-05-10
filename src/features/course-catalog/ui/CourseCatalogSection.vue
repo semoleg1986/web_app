@@ -2,14 +2,14 @@
   <section class="catalog">
     <h2>{{ t("catalog.title") }}</h2>
     <ul v-if="courses.length > 0" class="grid">
-      <li v-for="course in courses" :key="course.id" class="card">
+      <AppCard v-for="course in courses" :key="course.id" tag="li" class="card">
         <h3>
           <NuxtLink class="card-link" :to="`/courses/${course.id}`">{{ course.title }}</NuxtLink>
         </h3>
         <p>{{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}</p>
         <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
         <NuxtLink class="open-link" :to="`/courses/${course.id}`">{{ t("catalog.open") }}</NuxtLink>
-      </li>
+      </AppCard>
     </ul>
     <p v-else class="empty">{{ t("catalog.empty") }}</p>
   </section>
@@ -19,6 +19,7 @@
 import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
+import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
 defineProps<{
   courses: CourseCardItem[];
@@ -29,7 +30,7 @@ const { t } = usePreferences();
 
 <style scoped>
 .catalog {
-  margin-top: 2rem;
+  height: 100%;
 }
 
 .grid {
@@ -41,9 +42,6 @@ const { t } = usePreferences();
 }
 
 .card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
   padding: 1rem;
 }
 

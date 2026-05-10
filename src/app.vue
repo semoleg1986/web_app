@@ -1,8 +1,11 @@
 <template>
   <div class="app-shell">
     <AppHeader />
-    <NuxtPage />
+    <main class="app-shell__content">
+      <NuxtPage />
+    </main>
     <AppFooter />
+    <MobileNavWidget />
   </div>
 </template>
 
@@ -12,6 +15,7 @@ import { useAuthSession } from "~/features/auth";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppFooter from "~/shared/ui/app-footer/AppFooter.vue";
 import AppHeader from "~/widgets/app-header/ui/AppHeaderWidget.vue";
+import MobileNavWidget from "~/widgets/mobile-nav/ui/MobileNavWidget.vue";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();
@@ -80,8 +84,15 @@ onMounted(() => {
 
 <style scoped>
 .app-shell {
-  min-height: 100dvh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell__content {
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }
 </style>

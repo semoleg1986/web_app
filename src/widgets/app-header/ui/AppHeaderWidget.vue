@@ -20,54 +20,48 @@
             </div>
           </div>
 
-          <button type="button" class="header__button header__button--ghost" :disabled="pending" @click="handleLogout">
+          <AppButton variant="ghost" :disabled="pending" @click="handleLogout">
             {{ pending ? t("auth.loading") : t("auth.logout") }}
-          </button>
+          </AppButton>
         </div>
 
         <div v-else class="header__guest">
-          <button type="button" class="header__button header__button--ghost" @click="open('login')">
+          <AppButton variant="ghost" @click="openLogin">
             {{ t("auth.login.title") }}
-          </button>
-          <button type="button" class="header__button" @click="open('register')">
+          </AppButton>
+          <AppButton @click="openRegister">
             {{ t("auth.register.title") }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </div>
 
-    <div v-if="showAuthPanel && !user" class="header__panel">
-      <AuthPanel :mode-value="authPanelMode" @close="showAuthPanel = false" />
+    <div v-if="authPanelOpen && !user" class="header__panel">
+      <AuthPanel :mode-value="authPanelMode" @close="closePanel" />
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
 
-import { useAuthSession } from "~/features/auth/model/use-auth-session";
+import { useAuthPanel, useAuthSession } from "~/features/auth";
 import AuthPanel from "~/features/auth/ui/AuthPanel.vue";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
-
-const authPanelMode = ref<"login" | "register">("login");
-const showAuthPanel = ref(false);
+import AppButton from "~/shared/ui/app-button/AppButton.vue";
 
 const { logout, pending, user } = useAuthSession();
+const { closePanel, mode: authPanelMode, open: authPanelOpen, openLogin, openRegister } = useAuthPanel();
 const { t } = usePreferences();
 
 async function handleLogout() {
   await logout();
-  showAuthPanel.value = false;
-}
-
-function open(mode: "login" | "register") {
-  authPanelMode.value = mode;
-  showAuthPanel.value = true;
+  closePanel();
 }
 
 watch(user, (nextUser) => {
   if (nextUser) {
-    showAuthPanel.value = false;
+    closePanel();
   }
 });
 </script>
@@ -150,23 +144,6 @@ watch(user, (nextUser) => {
   font-size: 0.76rem;
 }
 
-.header__button {
-  border: none;
-  border-radius: 999px;
-  background: var(--c-accent);
-  color: white;
-  padding: 0.7rem 1rem;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.header__button--ghost {
-  border: 1px solid var(--c-border);
-  background: transparent;
-  color: var(--c-fg);
-}
-
 .header__panel {
   max-width: 1080px;
   margin: 0 auto;
@@ -196,6 +173,12 @@ watch(user, (nextUser) => {
   .header__roles {
     text-align: left;
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    position: relative;
   }
 }
 </style>

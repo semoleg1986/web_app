@@ -10,46 +10,38 @@
         <div class="control">
           <span class="control__label">{{ t('footer.language') }}</span>
           <div class="chip-group">
-            <button
+            <AppChip
               v-for="code in locales"
               :key="code"
-              type="button"
-              class="chip"
-              :class="{ 'chip--active': locale === code }"
+              :active="locale === code"
               @click="setLocale(code)"
             >
               {{ code.toUpperCase() }}
-            </button>
+            </AppChip>
           </div>
         </div>
 
         <div class="control">
           <span class="control__label">{{ t('footer.theme') }}</span>
           <div class="chip-group">
-            <button
-              type="button"
-              class="chip"
-              :class="{ 'chip--active': themeMode === 'system' }"
+            <AppChip
+              :active="themeMode === 'system'"
               @click="setThemeMode('system')"
             >
               {{ t('footer.theme.system') }}
-            </button>
-            <button
-              type="button"
-              class="chip"
-              :class="{ 'chip--active': themeMode === 'light' }"
+            </AppChip>
+            <AppChip
+              :active="themeMode === 'light'"
               @click="setThemeMode('light')"
             >
               {{ t('footer.theme.light') }}
-            </button>
-            <button
-              type="button"
-              class="chip"
-              :class="{ 'chip--active': themeMode === 'dark' }"
+            </AppChip>
+            <AppChip
+              :active="themeMode === 'dark'"
               @click="setThemeMode('dark')"
             >
               {{ t('footer.theme.dark') }}
-            </button>
+            </AppChip>
           </div>
         </div>
       </div>
@@ -60,6 +52,7 @@
 <script setup lang="ts">
 import type { LocaleCode } from '~/shared/lib/preferences/types';
 import { usePreferences } from '~/shared/lib/preferences/use-preferences';
+import AppChip from "~/shared/ui/app-chip/AppChip.vue";
 
 const locales: LocaleCode[] = ['ru', 'en'];
 const year = new Date().getFullYear();
@@ -69,7 +62,6 @@ const { locale, themeMode, setLocale, setThemeMode, t } = usePreferences();
 
 <style scoped>
 .footer {
-  margin-top: 2.5rem;
   border-top: 1px solid var(--c-border);
   background: var(--c-footer-bg);
 }
@@ -116,18 +108,10 @@ const { locale, themeMode, setLocale, setThemeMode, t } = usePreferences();
   flex-wrap: wrap;
 }
 
-.chip {
-  border: 1px solid var(--c-border);
-  border-radius: 999px;
-  background: var(--c-surface);
-  color: var(--c-fg);
-  padding: 0.35rem 0.75rem;
-  font-size: 0.82rem;
-  cursor: pointer;
+@media (max-width: 767px) {
+  .footer {
+    display: none;
+  }
 }
 
-.chip--active {
-  border-color: var(--c-accent);
-  box-shadow: inset 0 0 0 1px var(--c-accent);
-}
 </style>

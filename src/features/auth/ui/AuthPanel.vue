@@ -1,76 +1,61 @@
 <template>
   <section class="auth-panel">
     <div class="auth-panel__tabs" role="tablist" :aria-label="t('auth.panel.label')">
-      <button
-        type="button"
-        class="auth-panel__tab"
-        :class="{ 'auth-panel__tab--active': mode === 'login' }"
-        @click="mode = 'login'"
-      >
+      <AppChip :active="mode === 'login'" @click="mode = 'login'">
         {{ t("auth.login.title") }}
-      </button>
-      <button
-        type="button"
-        class="auth-panel__tab"
-        :class="{ 'auth-panel__tab--active': mode === 'register' }"
-        @click="mode = 'register'"
-      >
+      </AppChip>
+      <AppChip :active="mode === 'register'" @click="mode = 'register'">
         {{ t("auth.register.title") }}
-      </button>
+      </AppChip>
     </div>
 
     <form v-if="mode === 'login'" class="auth-form" @submit.prevent="submitLogin">
-      <label class="auth-form__field">
-        <span>{{ t("auth.email") }}</span>
+      <AppFormField :label="t('auth.email')">
         <input v-model.trim="loginForm.email" type="email" autocomplete="email" required />
-      </label>
+      </AppFormField>
 
-      <label class="auth-form__field">
-        <span>{{ t("auth.password") }}</span>
+      <AppFormField :label="t('auth.password')">
         <input
           v-model="loginForm.password"
           type="password"
           autocomplete="current-password"
           required
         />
-      </label>
+      </AppFormField>
 
       <p v-if="errorMessage" class="auth-form__error">{{ errorMessage }}</p>
 
-      <button class="auth-form__submit" type="submit" :disabled="pending">
+      <AppButton block type="submit" :disabled="pending">
         {{ pending ? t("auth.loading") : t("auth.login.submit") }}
-      </button>
+      </AppButton>
     </form>
 
     <form v-else class="auth-form" @submit.prevent="submitRegister">
-      <label class="auth-form__field">
-        <span>{{ t("auth.email") }}</span>
+      <AppFormField :label="t('auth.email')">
         <input v-model.trim="registerForm.email" type="email" autocomplete="email" required />
-      </label>
+      </AppFormField>
 
-      <label class="auth-form__field">
-        <span>{{ t("auth.password") }}</span>
+      <AppFormField :label="t('auth.password')">
         <input
           v-model="registerForm.password"
           type="password"
           autocomplete="new-password"
           required
         />
-      </label>
+      </AppFormField>
 
-      <label class="auth-form__field">
-        <span>{{ t("auth.register.role") }}</span>
+      <AppFormField :label="t('auth.register.role')">
         <select v-model="registerForm.default_role">
           <option value="parent">{{ t("auth.role.parent") }}</option>
           <option value="student">{{ t("auth.role.student") }}</option>
         </select>
-      </label>
+      </AppFormField>
 
       <p v-if="errorMessage" class="auth-form__error">{{ errorMessage }}</p>
 
-      <button class="auth-form__submit" type="submit" :disabled="pending">
+      <AppButton block type="submit" :disabled="pending">
         {{ pending ? t("auth.loading") : t("auth.register.submit") }}
-      </button>
+      </AppButton>
     </form>
   </section>
 </template>
@@ -81,6 +66,9 @@ import { computed, reactive, ref, watch } from "vue";
 import type { AuthRole } from "~/features/auth/model/types";
 import { useAuthSession } from "~/features/auth/model/use-auth-session";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
+import AppButton from "~/shared/ui/app-button/AppButton.vue";
+import AppChip from "~/shared/ui/app-chip/AppChip.vue";
+import AppFormField from "~/shared/ui/app-form-field/AppFormField.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -163,62 +151,14 @@ async function submitRegister() {
   margin-bottom: 1rem;
 }
 
-.auth-panel__tab {
-  border: 1px solid var(--c-border);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--c-muted);
-  padding: 0.6rem 0.8rem;
-  font: inherit;
-  cursor: pointer;
-}
-
-.auth-panel__tab--active {
-  border-color: var(--c-accent);
-  color: var(--c-fg);
-  box-shadow: inset 0 0 0 1px var(--c-accent);
-}
-
 .auth-form {
   display: grid;
   gap: 0.85rem;
-}
-
-.auth-form__field {
-  display: grid;
-  gap: 0.35rem;
-  font-size: 0.92rem;
-}
-
-.auth-form__field input,
-.auth-form__field select {
-  border: 1px solid var(--c-border);
-  border-radius: 0.85rem;
-  background: var(--c-bg);
-  color: var(--c-fg);
-  padding: 0.8rem 0.9rem;
-  font: inherit;
 }
 
 .auth-form__error {
   margin: 0;
   color: #ba3b46;
   font-size: 0.9rem;
-}
-
-.auth-form__submit {
-  border: none;
-  border-radius: 999px;
-  background: var(--c-accent);
-  color: white;
-  padding: 0.8rem 1rem;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.auth-form__submit:disabled {
-  opacity: 0.65;
-  cursor: wait;
 }
 </style>

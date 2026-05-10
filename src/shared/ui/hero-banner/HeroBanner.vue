@@ -1,11 +1,13 @@
 <template>
-  <section class="hero">
+  <AppCard tag="section" tone="hero" class="hero">
     <h1>{{ title }}</h1>
     <p>{{ subtitle }}</p>
-  </section>
+  </AppCard>
 </template>
 
 <script setup lang="ts">
+import AppCard from "~/shared/ui/app-card/AppCard.vue";
+
 defineProps<{
   title: string;
   subtitle: string;
@@ -15,9 +17,6 @@ defineProps<{
 <style scoped>
 .hero {
   padding: 2rem 1rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, color-mix(in oklab, var(--c-surface), #f9f4e8 35%) 0%, color-mix(in oklab, var(--c-surface), #d6f0f0 50%) 100%);
-  border: 1px solid var(--c-border);
 }
 
 h1 {
