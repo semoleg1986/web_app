@@ -27,7 +27,24 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import HeroBanner from "~/shared/ui/hero-banner/HeroBanner.vue";
 import { useHomePage } from "~/widgets/home-page/model/use-home-page";
 
-const { courses, status, t } = await useHomePage();
+const { courses, homeSchema, status, t, title } = await useHomePage();
+
+useSeoMeta({
+  title,
+  description: "Образовательная платформа с курсами, уроками и live-классами.",
+  ogTitle: title,
+  ogDescription: "Образовательная платформа для детей, родителей и учителей."
+});
+
+useHead(() => ({
+  script: [
+    {
+      id: "ld-json-home",
+      type: "application/ld+json",
+      textContent: JSON.stringify(homeSchema.value)
+    }
+  ]
+}));
 </script>
 
 <style scoped>

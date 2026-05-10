@@ -29,7 +29,28 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import { useCourseDetailsPage } from "~/widgets/course-details-page/model/use-course-details-page";
 
 const { t } = usePreferences();
-const { course } = await useCourseDetailsPage();
+const { course, courseSchema, courseTitle, courseUrl } = await useCourseDetailsPage();
+
+useSeoMeta({
+  title: courseTitle,
+  description: () => course.value.description,
+  ogTitle: courseTitle,
+  ogDescription: () => course.value.description,
+  ogType: "article",
+  ogUrl: courseUrl,
+  twitterTitle: courseTitle,
+  twitterDescription: () => course.value.description
+});
+
+useHead(() => ({
+  script: [
+    {
+      id: "ld-json-course",
+      type: "application/ld+json",
+      textContent: JSON.stringify(courseSchema.value)
+    }
+  ]
+}));
 </script>
 
 <style scoped>

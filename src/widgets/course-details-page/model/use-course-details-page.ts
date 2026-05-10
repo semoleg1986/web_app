@@ -17,17 +17,6 @@ export async function useCourseDetailsPage() {
   const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value.id}`);
   const courseTitle = computed(() => buildCourseTitle(course.value.title));
 
-  useSeoMeta({
-    title: courseTitle,
-    description: () => course.value.description,
-    ogTitle: courseTitle,
-    ogDescription: () => course.value.description,
-    ogType: "article",
-    ogUrl: courseUrl,
-    twitterTitle: courseTitle,
-    twitterDescription: () => course.value.description
-  });
-
   const courseSchema = computed(() => ({
     "@context": "https://schema.org",
     "@graph": [
@@ -63,17 +52,10 @@ export async function useCourseDetailsPage() {
     ]
   }));
 
-  useHead(() => ({
-    script: [
-      {
-        id: "ld-json-course",
-        type: "application/ld+json",
-        textContent: JSON.stringify(courseSchema.value)
-      }
-    ]
-  }));
-
   return {
-    course
+    course,
+    courseSchema,
+    courseTitle,
+    courseUrl
   };
 }

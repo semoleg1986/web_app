@@ -9,14 +9,6 @@ export async function useHomePage() {
 
   const title = computed(() => buildCourseTitle(t("page.hero.title")));
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
-
-  useSeoMeta({
-    title,
-    description: "Образовательная платформа с курсами, уроками и live-классами.",
-    ogTitle: title,
-    ogDescription: "Образовательная платформа для детей, родителей и учителей."
-  });
-
   const { data: health } = await useHealthQuery();
   const status = computed(() => (health.value?.ok ? "ok" : "degraded"));
   const { courses } = await useCourseCatalog();
@@ -49,19 +41,11 @@ export async function useHomePage() {
     ]
   }));
 
-  useHead(() => ({
-    script: [
-      {
-        id: "ld-json-home",
-        type: "application/ld+json",
-        textContent: JSON.stringify(homeSchema.value)
-      }
-    ]
-  }));
-
   return {
     courses,
+    homeSchema,
     status,
-    t
+    t,
+    title
   };
 }
