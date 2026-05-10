@@ -1,6 +1,9 @@
 export default defineNuxtConfig({
   ssr: true,
   srcDir: "src/",
+  dir: {
+    public: "../public"
+  },
   css: ["~/app/styles/main.css"],
   devtools: { enabled: false },
   nitro: {
