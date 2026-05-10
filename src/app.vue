@@ -1,5 +1,6 @@
 <template>
   <div class="app-shell">
+    <AppHeader />
     <NuxtPage />
     <AppFooter />
   </div>
@@ -10,6 +11,7 @@ import { computed, onMounted, watchEffect } from "vue";
 import { useAuthSession } from "~/features/auth";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppFooter from "~/shared/ui/app-footer/AppFooter.vue";
+import AppHeader from "~/widgets/app-header/ui/AppHeaderWidget.vue";
 
 const route = useRoute();
 const runtimeConfig = useRuntimeConfig();

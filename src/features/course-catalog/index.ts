@@ -1,3 +1,4 @@
+export { useCourseCatalogClient } from "~/features/course-catalog/api/course-catalog-client";
 export { useCourseCatalogQuery } from "~/features/course-catalog/api/use-course-catalog-query";
 export { useCourseDetailsQuery } from "~/features/course-catalog/api/use-course-details-query";
 export { useCourseCatalog } from "~/features/course-catalog/model/use-course-catalog";

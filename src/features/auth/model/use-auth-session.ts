@@ -1,4 +1,8 @@
-import type { AuthMe, AuthLoginPayload } from "~/features/auth/model/types";
+import type {
+  AuthLoginPayload,
+  AuthMe,
+  AuthRegisterPayload
+} from "~/features/auth/model/types";
 import { useAuthClient } from "~/features/auth/api/auth-client";
 import { ApiRequestError } from "~/shared/api/types";
 
@@ -64,6 +68,20 @@ export function useAuthSession() {
     }
   }
 
+  async function register(payload: AuthRegisterPayload) {
+    state.value.pending = true;
+    state.value.error = null;
+
+    try {
+      return await authClient.register(payload);
+    } catch (error) {
+      state.value.error = error as ApiRequestError;
+      throw error;
+    } finally {
+      state.value.pending = false;
+    }
+  }
+
   async function logout() {
     state.value.pending = true;
     state.value.error = null;
@@ -88,6 +106,7 @@ export function useAuthSession() {
     login,
     logout,
     pending: computed(() => state.value.pending),
+    register,
     user: computed(() => state.value.user)
   };
 }
