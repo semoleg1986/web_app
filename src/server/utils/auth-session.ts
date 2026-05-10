@@ -1,12 +1,22 @@
 import { Buffer } from "node:buffer";
-import { deleteCookie, getCookie, setCookie } from "h3";
+import { deleteCookie, getCookie, getRequestProtocol, setCookie } from "h3";
 import type { H3Event } from "h3";
 
 const ACCESS_TOKEN_COOKIE = "curs_access_token";
 const REFRESH_TOKEN_COOKIE = "curs_refresh_token";
 
-function isSecureCookie() {
-  return process.env.NODE_ENV === "production";
+function isSecureCookie(event: H3Event) {
+  const override = process.env.NUXT_AUTH_COOKIE_SECURE?.trim().toLowerCase();
+
+  if (override === "1" || override === "true") {
+    return true;
+  }
+
+  if (override === "0" || override === "false") {
+    return false;
+  }
+
+  return getRequestProtocol(event, { xForwardedProto: true }) === "https";
 }
 
 function decodeJwtPayload(token: string) {
@@ -56,14 +66,14 @@ export function setAuthCookies(
     maxAge: input.expiresIn,
     path: "/",
     sameSite: "lax",
-    secure: isSecureCookie()
+    secure: isSecureCookie(event)
   });
 
   setCookie(event, REFRESH_TOKEN_COOKIE, input.refreshToken, {
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secure: isSecureCookie()
+    secure: isSecureCookie(event)
   });
 }
 
@@ -72,12 +82,12 @@ export function clearAuthCookies(event: H3Event) {
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secure: isSecureCookie()
+    secure: isSecureCookie(event)
   });
   deleteCookie(event, REFRESH_TOKEN_COOKIE, {
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secure: isSecureCookie()
+    secure: isSecureCookie(event)
   });
 }

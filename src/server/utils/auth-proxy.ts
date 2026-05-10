@@ -24,6 +24,37 @@ interface AuthMeResponse {
   status: "active" | "blocked" | "archived";
 }
 
+async function fetchMeWithAccessToken(
+  event: H3Event,
+  accessToken: string
+): Promise<AuthMeResponse | Record<string, unknown>> {
+  const headers = new Headers();
+  forwardTracingHeaders(event, headers);
+  headers.set("Authorization", `Bearer ${accessToken}`);
+
+  const response = await fetch(`${authServiceBaseUrl()}/v1/auth/me`, {
+    headers,
+    method: "GET"
+  });
+
+  if (!response.ok) {
+    return await forwardUpstreamError(event, response);
+  }
+
+  const requestId = response.headers.get("x-request-id");
+  const correlationId = response.headers.get("x-correlation-id");
+
+  if (requestId) {
+    setHeader(event, "X-Request-ID", requestId);
+  }
+
+  if (correlationId) {
+    setHeader(event, "X-Correlation-ID", correlationId);
+  }
+
+  return (await response.json()) as AuthMeResponse;
+}
+
 function authServiceBaseUrl() {
   const runtimeConfig = useRuntimeConfig();
 
@@ -130,7 +161,7 @@ export async function proxyLogin(event: H3Event) {
     refreshToken: tokenPair.refresh_token
   });
 
-  const meResponse = await proxyMe(event);
+  const meResponse = await fetchMeWithAccessToken(event, tokenPair.access_token);
 
   if ("account_id" in (meResponse as Record<string, unknown>)) {
     return {
