@@ -90,7 +90,7 @@ useSeoMeta({
   description: () => course.value.description,
   ogTitle: courseTitle,
   ogDescription: () => course.value.description,
-  ogType: "article",
+  ogType: "website",
   ogUrl: courseUrl,
   twitterTitle: courseTitle,
   twitterDescription: () => course.value.description
