@@ -141,7 +141,7 @@ async function createIntent() {
     paymentIntent.value = await paymentsClient.createPaymentIntent({
       idempotency_key: `web-offer-${course.value.defaultOffer.offerId}-${selectedStudentId.value}`,
       offer_id: course.value.defaultOffer.offerId,
-      parent_id: user.value.account_id,
+      parent_id: user.value.user_id,
       student_id: selectedStudentId.value
     });
   } catch (error) {
