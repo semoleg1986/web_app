@@ -57,6 +57,9 @@ export function useAuthSession() {
 
     try {
       const session = await authClient.login(payload);
+      await authClient.ensureMyProfile({
+        email: session.user.email
+      });
       state.value.user = session.user;
       state.value.initialized = true;
       return session;
@@ -73,7 +76,8 @@ export function useAuthSession() {
     state.value.error = null;
 
     try {
-      return await authClient.register(payload);
+      const registered = await authClient.register(payload);
+      return registered;
     } catch (error) {
       state.value.error = error as ApiRequestError;
       throw error;
