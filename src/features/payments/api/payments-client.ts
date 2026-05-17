@@ -8,6 +8,7 @@ export interface PaymentIntentSnapshot {
   currency: string;
   expires_at: string | null;
   final_price: number;
+  offer_id: string;
   parent_id: string;
   payment_intent_id: string;
   status: string;
@@ -19,8 +20,8 @@ export interface PaymentIntentSnapshot {
 export interface CreatePaymentIntentPayload {
   attribution_token?: string | null;
   bonus_amount?: number | null;
-  course_id: string;
   idempotency_key?: string | null;
+  offer_id: string;
   parent_id: string;
   payment_intent_id?: string | null;
   student_id: string;

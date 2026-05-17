@@ -5,6 +5,6 @@ interface CourseDetailsResponse {
   item: CourseDetailsItem;
 }
 
-export function useCourseDetailsQuery(courseId: string) {
-  return useApiQuery<CourseDetailsResponse>(`/courses/${courseId}`);
+export function useCourseDetailsQuery(slug: string) {
+  return useApiQuery<CourseDetailsResponse>(`/courses/${slug}`);
 }

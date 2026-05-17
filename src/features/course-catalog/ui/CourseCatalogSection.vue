@@ -8,6 +8,8 @@
         </h3>
         <p>{{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}</p>
         <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
+        <p>{{ t("catalog.price") }}: {{ formatPrice(course.offer.price) }}</p>
+        <p>{{ t("catalog.offers") }}: {{ course.offersCount }}</p>
         <NuxtLink class="open-link" :to="`/courses/${course.id}`">{{ t("catalog.open") }}</NuxtLink>
       </AppCard>
     </ul>
@@ -26,6 +28,13 @@ defineProps<{
 }>();
 
 const { t } = usePreferences();
+
+const formatPrice = (price: CourseCardItem["offer"]["price"]) =>
+  new Intl.NumberFormat(undefined, {
+    currency: price.currency,
+    maximumFractionDigits: 0,
+    style: "currency"
+  }).format(price.salePrice);
 </script>
 
 <style scoped>

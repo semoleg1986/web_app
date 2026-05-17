@@ -3,6 +3,15 @@
     <h1>{{ course.title }}</h1>
     <p>{{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}</p>
     <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
+    <div v-if="course.offers.length > 0" class="offers">
+      <h2>{{ t("catalog.offers") }}</h2>
+      <ul class="offers__list">
+        <li v-for="offer in course.offers" :key="offer.offerId" class="offers__item">
+          <strong>{{ offer.title }}</strong>
+          <span>{{ formatPrice(offer.price) }}</span>
+        </li>
+      </ul>
+    </div>
     <h2>{{ t("course.description") }}</h2>
     <p class="description">{{ course.description }}</p>
   </AppCard>
@@ -19,6 +28,13 @@ defineProps<{
 }>();
 
 const { t } = usePreferences();
+
+const formatPrice = (price: CourseDetailsItem["offers"][number]["price"]) =>
+  new Intl.NumberFormat(undefined, {
+    currency: price.currency,
+    maximumFractionDigits: 0,
+    style: "currency"
+  }).format(price.salePrice);
 </script>
 
 <style scoped>
@@ -42,5 +58,22 @@ p {
 
 .description {
   line-height: 1.5;
+}
+
+.offers {
+  margin-top: 1rem;
+}
+
+.offers__list {
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.offers__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
 </style>

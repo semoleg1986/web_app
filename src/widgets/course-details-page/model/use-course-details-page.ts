@@ -6,13 +6,13 @@ export async function useCourseDetailsPage() {
   const runtimeConfig = useRuntimeConfig();
 
   const routeParam = route.params.id;
-  const courseId = Array.isArray(routeParam) ? routeParam[0] : routeParam;
+  const slug = Array.isArray(routeParam) ? routeParam[0] : routeParam;
 
-  if (!courseId) {
+  if (!slug) {
     throw createError({ statusCode: 404, statusMessage: "Course not found" });
   }
 
-  const { course } = await useCourseDetails(courseId);
+  const { course } = await useCourseDetails(slug);
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
   const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value.id}`);
   const courseTitle = computed(() => buildCourseTitle(course.value.title));
@@ -43,6 +43,13 @@ export async function useCourseDetailsPage() {
         url: courseUrl.value,
         description: course.value.description,
         educationalLevel: normalizeCourseLevel(course.value.level),
+        offers: course.value.defaultOffer
+          ? {
+              "@type": "Offer",
+              price: course.value.defaultOffer.price.salePrice,
+              priceCurrency: course.value.defaultOffer.price.currency
+            }
+          : undefined,
         provider: {
           "@type": "Organization",
           name: runtimeConfig.public.appName,
