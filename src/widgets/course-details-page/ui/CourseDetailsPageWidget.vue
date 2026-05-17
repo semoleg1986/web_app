@@ -23,26 +23,70 @@
         <p v-if="!isAuthenticated">{{ t("course.checkout.loginRequired") }}</p>
         <p v-else-if="!isParent">{{ t("course.checkout.parentOnly") }}</p>
         <p v-else-if="!course.defaultOffer">{{ t("course.checkout.noOffer") }}</p>
-        <p v-else-if="students.length === 0">{{ t("course.checkout.noStudents") }}</p>
-        <div v-else class="checkout-card__form">
-          <AppFormField :label="t('course.checkout.student')">
-            <select v-model="selectedStudentId">
-              <option v-for="student in students" :key="student.user_id" :value="student.user_id">
-                {{ student.display_name }}
-              </option>
-            </select>
-          </AppFormField>
+        <div v-else class="checkout-card__stack">
+          <div v-if="students.length === 0 || showCreateStudentForm" class="checkout-card__form">
+            <h3>{{ t("course.checkout.addChildTitle") }}</h3>
+            <p v-if="students.length === 0">{{ t("course.checkout.noStudents") }}</p>
 
-          <AppButton :disabled="checkoutPending || !selectedStudentId" block @click="createIntent">
-            {{ checkoutPending ? t("course.checkout.pending") : t("course.checkout.submit") }}
-          </AppButton>
+            <AppFormField :label="t('course.checkout.childName')">
+              <input v-model="createStudentForm.display_name" type="text" autocomplete="name" />
+            </AppFormField>
 
-          <p v-if="checkoutError" class="checkout-card__error">{{ checkoutError }}</p>
+            <AppFormField :label="t('course.checkout.childEmail')">
+              <input v-model="createStudentForm.email" type="email" autocomplete="email" />
+            </AppFormField>
 
-          <div v-if="paymentIntent" class="checkout-card__success">
-            <strong>{{ t("course.checkout.success") }}</strong>
-            <p>{{ t("course.checkout.intent") }}: {{ paymentIntent.payment_intent_id }}</p>
-            <p>{{ t("course.checkout.total") }}: {{ formatMoney(paymentIntent.final_price, paymentIntent.currency) }}</p>
+            <AppFormField :label="t('course.checkout.childPhone')">
+              <input v-model="createStudentForm.phone" type="tel" autocomplete="tel" />
+            </AppFormField>
+
+            <AppButton
+              :disabled="createStudentPending || !canCreateStudent"
+              block
+              @click="createStudent"
+            >
+              {{
+                createStudentPending
+                  ? t("course.checkout.childPending")
+                  : t("course.checkout.childCreate")
+              }}
+            </AppButton>
+
+            <p v-if="createStudentError" class="checkout-card__error">{{ createStudentError }}</p>
+            <p v-if="createStudentSuccess" class="checkout-card__success-text">
+              {{ t("course.checkout.childSuccess") }}
+            </p>
+          </div>
+
+          <div v-if="students.length > 0" class="checkout-card__form">
+            <AppButton
+              v-if="!showCreateStudentForm"
+              variant="ghost"
+              size="sm"
+              @click="showCreateStudentForm = true"
+            >
+              {{ t("course.checkout.addChild") }}
+            </AppButton>
+
+            <AppFormField :label="t('course.checkout.student')">
+              <select v-model="selectedStudentId">
+                <option v-for="student in students" :key="student.user_id" :value="student.user_id">
+                  {{ student.display_name }}
+                </option>
+              </select>
+            </AppFormField>
+
+            <AppButton :disabled="checkoutPending || !selectedStudentId" block @click="createIntent">
+              {{ checkoutPending ? t("course.checkout.pending") : t("course.checkout.submit") }}
+            </AppButton>
+
+            <p v-if="checkoutError" class="checkout-card__error">{{ checkoutError }}</p>
+
+            <div v-if="paymentIntent" class="checkout-card__success">
+              <strong>{{ t("course.checkout.success") }}</strong>
+              <p>{{ t("course.checkout.intent") }}: {{ paymentIntent.payment_intent_id }}</p>
+              <p>{{ t("course.checkout.total") }}: {{ formatMoney(paymentIntent.final_price, paymentIntent.currency) }}</p>
+            </div>
           </div>
         </div>
       </AppCard>
@@ -60,7 +104,7 @@ import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-
 import type { CourseDetailsItem } from "~/features/course-catalog/model/types";
 import { CourseDetailsCard } from "~/features/course-catalog";
 import { useAuthSession } from "~/features/auth";
-import { useParentStudentsQuery } from "~/features/parent-students";
+import { useParentStudentsClient, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
 import {
   type PaymentIntentSnapshot,
@@ -80,6 +124,7 @@ const runtimeConfig = useRuntimeConfig();
 const routeParam = route.params.id;
 const slug = Array.isArray(routeParam) ? routeParam[0] : routeParam;
 const paymentsClient = usePaymentsClient();
+const parentStudentsClient = useParentStudentsClient();
 const { isAuthenticated, user } = useAuthSession();
 
 if (!slug) {
@@ -95,12 +140,28 @@ if (error.value || !data.value?.item) {
 const course = computed<CourseDetailsItem>(() => data.value!.item);
 const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
 const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
-const { data: studentsData } = await useParentStudentsQuery(studentsEnabled.value);
+const { data: studentsData, refresh: refreshStudents } = await useParentStudentsQuery(
+  studentsEnabled.value
+);
 const students = computed<ParentStudentItem[]>(() => studentsData.value?.items ?? []);
 const selectedStudentId = ref("");
+const showCreateStudentForm = ref(false);
+const createStudentPending = ref(false);
+const createStudentError = ref("");
+const createStudentSuccess = ref(false);
+const createStudentForm = reactive({
+  display_name: "",
+  email: "",
+  phone: ""
+});
 const checkoutPending = ref(false);
 const checkoutError = ref("");
 const paymentIntent = ref<PaymentIntentSnapshot | null>(null);
+const canCreateStudent = computed(
+  () =>
+    createStudentForm.display_name.trim().length > 0 &&
+    createStudentForm.email.trim().length > 0
+);
 
 watch(
   students,
@@ -127,6 +188,36 @@ const formatMoney = (amount: number, currency: string) =>
     maximumFractionDigits: 0,
     style: "currency"
   }).format(amount);
+
+async function createStudent() {
+  if (!canCreateStudent.value) {
+    return;
+  }
+
+  createStudentPending.value = true;
+  createStudentError.value = "";
+  createStudentSuccess.value = false;
+
+  try {
+    const created = await parentStudentsClient.createMyStudent({
+      display_name: createStudentForm.display_name.trim(),
+      email: createStudentForm.email.trim(),
+      phone: createStudentForm.phone.trim() || null
+    });
+    await refreshStudents();
+    selectedStudentId.value = created.user_id;
+    createStudentForm.display_name = "";
+    createStudentForm.email = "";
+    createStudentForm.phone = "";
+    createStudentSuccess.value = true;
+    showCreateStudentForm.value = false;
+  } catch (error) {
+    createStudentError.value =
+      error instanceof ApiRequestError ? error.message : "Failed to create child";
+  } finally {
+    createStudentPending.value = false;
+  }
+}
 
 async function createIntent() {
   if (!user.value || !course.value.defaultOffer || !selectedStudentId.value) {
@@ -270,9 +361,19 @@ useHead(() => ({
   padding: 1rem;
 }
 
+.checkout-card__stack {
+  display: grid;
+  gap: 1rem;
+}
+
 .checkout-card__form {
   display: grid;
   gap: 0.75rem;
+}
+
+.checkout-card__success-text {
+  margin: 0;
+  color: var(--c-accent);
 }
 
 .checkout-card__error {

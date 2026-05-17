@@ -1,5 +1,11 @@
 import { useApiClient } from "~/shared/api/use-api-client";
 
+export interface CreateMyStudentPayload {
+  display_name: string;
+  email: string;
+  phone?: string | null;
+}
+
 export interface ParentStudentItem {
   created_at: string;
   display_name: string;
@@ -23,6 +29,12 @@ export function useParentStudentsClient() {
   const api = useApiClient();
 
   return {
+    createMyStudent(payload: CreateMyStudentPayload) {
+      return api.post<ParentStudentItem, CreateMyStudentPayload>(
+        "/parent/me/students",
+        payload
+      );
+    },
     listMyStudents() {
       return api.get<ParentStudentListResponse>("/parent/me/students");
     }
