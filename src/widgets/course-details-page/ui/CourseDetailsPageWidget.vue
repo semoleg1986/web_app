@@ -1,5 +1,5 @@
 <template>
-  <main class="course-page">
+  <main v-if="course" class="course-page">
     <AppShellSection class="course-page__sidebar" scroll="hidden">
       <template #header>
         <div class="course-page__nav">
@@ -24,6 +24,11 @@
       <CourseDetailsCard :course="course" />
     </AppShellSection>
   </main>
+  <main v-else class="course-page course-page--loading">
+    <AppShellSection class="course-page__content" :title="t('catalog.title')">
+      <p>{{ pending ? "Loading course..." : "Course not found." }}</p>
+    </AppShellSection>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -35,17 +40,17 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import { useCourseDetailsPage } from "~/widgets/course-details-page/model/use-course-details-page";
 
 const { t } = usePreferences();
-const { course, courseSchema, courseTitle, courseUrl, formatPrice } = useCourseDetailsPage();
+const { course, courseSchema, courseTitle, courseUrl, formatPrice, pending } = useCourseDetailsPage();
 
 useSeoMeta({
   title: courseTitle,
-  description: () => course.value.description,
+  description: () => course.value?.description ?? "",
   ogTitle: courseTitle,
-  ogDescription: () => course.value.description,
+  ogDescription: () => course.value?.description ?? "",
   ogType: "website",
   ogUrl: courseUrl,
   twitterTitle: courseTitle,
-  twitterDescription: () => course.value.description
+  twitterDescription: () => course.value?.description ?? ""
 });
 
 useHead(() => ({

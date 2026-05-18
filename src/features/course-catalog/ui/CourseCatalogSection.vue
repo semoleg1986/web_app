@@ -13,6 +13,7 @@
         <NuxtLink class="open-link" :to="`/courses/${course.id}`">{{ t("catalog.open") }}</NuxtLink>
       </AppCard>
     </ul>
+    <p v-else-if="pending" class="empty">Loading courses...</p>
     <p v-else class="empty">{{ t("catalog.empty") }}</p>
   </section>
 </template>
@@ -25,6 +26,7 @@ import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
 defineProps<{
   courses: CourseCardItem[];
+  pending?: boolean;
 }>();
 
 const { t } = usePreferences();

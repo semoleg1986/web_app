@@ -9,11 +9,22 @@ export function useHomePage() {
   const runtimeConfig = useRuntimeConfig();
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
   const title = computed(() => buildCourseTitle(t("page.hero.title")));
+  const catalogCache = useState<CourseCardItem[]>("home-course-catalog-cache", () => []);
 
   const { data: health } = useHealthQuery();
-  const { data: catalog } = useCourseCatalogQuery();
+  const { data: catalog, pending: catalogPending } = useCourseCatalogQuery();
 
-  const courses = computed<CourseCardItem[]>(() => catalog.value?.items ?? []);
+  watch(
+    catalog,
+    (value) => {
+      if (Array.isArray(value?.items) && value.items.length > 0) {
+        catalogCache.value = value.items;
+      }
+    },
+    { immediate: true }
+  );
+
+  const courses = computed<CourseCardItem[]>(() => catalog.value?.items ?? catalogCache.value);
   const status = computed(() => (health.value?.ok ? "ok" : "degraded"));
   const homeSchema = computed(() => ({
     "@context": "https://schema.org",
@@ -45,6 +56,7 @@ export function useHomePage() {
 
   return {
     courses,
+    catalogPending,
     homeSchema,
     status,
     title,

@@ -9,7 +9,7 @@
     </AppShellSection>
 
     <AppShellSection class="dashboard__catalog" :eyebrow="t('nav.home')" :title="t('catalog.title')">
-      <CourseCatalogSection :courses="courses" />
+      <CourseCatalogSection :courses="courses" :pending="catalogPending" />
     </AppShellSection>
   </main>
 </template>
@@ -20,7 +20,7 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import HeroBanner from "~/shared/ui/hero-banner/HeroBanner.vue";
 import { useHomePage } from "~/widgets/home-page/model/use-home-page";
 
-const { courses, homeSchema, status, t, title } = useHomePage();
+const { catalogPending, courses, homeSchema, status, t, title } = useHomePage();
 
 useSeoMeta({
   title,

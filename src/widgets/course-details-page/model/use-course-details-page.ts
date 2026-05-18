@@ -12,10 +12,10 @@ export function useCourseDetailsPage() {
     throw createError({ statusCode: 404, statusMessage: "Course not found" });
   }
 
-  const { course } = useCourseDetails(slug);
+  const { course, pending } = useCourseDetails(slug);
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
-  const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value.id}`);
-  const courseTitle = computed(() => buildCourseTitle(course.value.title));
+  const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value?.id ?? slug}`);
+  const courseTitle = computed(() => buildCourseTitle(course.value?.title ?? "Course"));
 
   const courseSchema = computed(() => ({
     "@context": "https://schema.org",
@@ -32,18 +32,18 @@ export function useCourseDetailsPage() {
           {
             "@type": "ListItem",
             position: 2,
-            name: course.value.title,
+            name: course.value?.title ?? "Course",
             item: courseUrl.value
           }
         ]
       },
       {
         "@type": "Course",
-        name: course.value.title,
+        name: course.value?.title ?? "Course",
         url: courseUrl.value,
-        description: course.value.description,
-        educationalLevel: normalizeCourseLevel(course.value.level),
-        offers: course.value.defaultOffer
+        description: course.value?.description ?? "",
+        educationalLevel: normalizeCourseLevel(course.value?.level ?? "unknown"),
+        offers: course.value?.defaultOffer
           ? {
               "@type": "Offer",
               price: course.value.defaultOffer.price.salePrice,
@@ -72,6 +72,7 @@ export function useCourseDetailsPage() {
     courseSchema,
     courseTitle,
     courseUrl,
-    formatPrice
+    formatPrice,
+    pending
   };
 }
