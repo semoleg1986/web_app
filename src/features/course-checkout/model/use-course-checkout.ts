@@ -1,9 +1,11 @@
 import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
-import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
+import {
+  useParentStudentsCommands,
+  useParentStudentsQuery
+} from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
-import { usePaymentIntentQuery, usePaymentsCommands } from "~/features/payments";
-import type { PaymentIntentSnapshot } from "~/features/payments";
+import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
@@ -15,9 +17,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
   const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(studentsEnabled);
   const selectedStudentsCookie = useCookie<Record<string, string>>("curs_checkout_students", {
-    default: () => ({})
-  });
-  const paymentIntentsCookie = useCookie<Record<string, string>>("curs_checkout_payment_intents", {
     default: () => ({})
   });
 
@@ -35,7 +34,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   });
   const checkoutPending = ref(false);
   const checkoutError = ref("");
-  const paymentIntent = ref<PaymentIntentSnapshot | null>(null);
 
   const canCreateStudent = computed(
     () =>
@@ -43,16 +41,14 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       createStudentForm.email.trim().length > 0
   );
 
-  const paymentIntentKey = computed(() =>
-    selectedStudentId.value ? `${courseKey.value}:${selectedStudentId.value}` : ""
+  const { data: checkoutStateData, refresh: refreshCheckoutState } = useCheckoutStateQuery(
+    selectedStudentId,
+    courseKey
   );
-  const persistedPaymentIntentId = computed(() =>
-    paymentIntentKey.value ? paymentIntentsCookie.value[paymentIntentKey.value] ?? "" : ""
-  );
-  const {
-    data: persistedPaymentIntentData,
-    error: persistedPaymentIntentError
-  } = usePaymentIntentQuery(persistedPaymentIntentId);
+
+  const checkoutState = computed(() => checkoutStateData.value ?? null);
+  const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
+  const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
 
   watch(
     students,
@@ -60,7 +56,8 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       if (!selectedStudentId.value && next.length > 0) {
         const persistedStudentId = selectedStudentsCookie.value[courseKey.value];
         selectedStudentId.value =
-          next.find((student) => student.user_id === persistedStudentId)?.user_id ?? next[0].user_id;
+          next.find((student) => student.user_id === persistedStudentId)?.user_id ??
+          next[0].user_id;
       }
     },
     { immediate: true }
@@ -73,25 +70,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
         [courseKey.value]: next
       };
     }
-  });
-
-  watch(
-    persistedPaymentIntentData,
-    (next) => {
-      paymentIntent.value = next ?? null;
-    },
-    { immediate: true }
-  );
-
-  watch(persistedPaymentIntentError, (next) => {
-    if (!next || !paymentIntentKey.value) {
-      return;
-    }
-
-    const nextCache = { ...paymentIntentsCookie.value };
-    delete nextCache[paymentIntentKey.value];
-    paymentIntentsCookie.value = nextCache;
-    paymentIntent.value = null;
   });
 
   async function createStudent() {
@@ -116,6 +94,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       createStudentForm.phone = "";
       createStudentSuccess.value = true;
       showCreateStudentForm.value = false;
+      await refreshCheckoutState();
     } catch (error) {
       createStudentError.value =
         error instanceof ApiRequestError ? error.message : "Failed to create child";
@@ -131,21 +110,15 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
     checkoutPending.value = true;
     checkoutError.value = "";
-    paymentIntent.value = null;
 
     try {
-      paymentIntent.value = await paymentsCommands.createPaymentIntent({
+      await paymentsCommands.createPaymentIntent({
         idempotency_key: `web-offer-${course.value.defaultOffer.offerId}-${selectedStudentId.value}`,
         offer_id: course.value.defaultOffer.offerId,
         parent_id: user.value.user_id,
         student_id: selectedStudentId.value
       });
-      if (paymentIntent.value && paymentIntentKey.value) {
-        paymentIntentsCookie.value = {
-          ...paymentIntentsCookie.value,
-          [paymentIntentKey.value]: paymentIntent.value.payment_intent_id
-        };
-      }
+      await refreshCheckoutState();
     } catch (error) {
       checkoutError.value =
         error instanceof ApiRequestError ? error.message : "Failed to create payment intent";
@@ -159,9 +132,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   }
 
   return {
+    accessGrant,
     canCreateStudent,
     checkoutError,
     checkoutPending,
+    checkoutState,
     createIntent,
     createStudent,
     createStudentError,

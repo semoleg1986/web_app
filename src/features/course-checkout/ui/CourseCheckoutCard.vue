@@ -20,6 +20,8 @@
 
       <StudentPicker
         v-if="students.length > 0"
+        :access-grant="accessGrant"
+        :checkout-state="checkoutState"
         :error-message="checkoutError"
         :payment-intent="paymentIntent"
         :pending="checkoutPending"
@@ -49,9 +51,11 @@ const props = defineProps<{
 const { t } = usePreferences();
 const course = toRef(props, "course");
 const {
+  accessGrant,
   canCreateStudent,
   checkoutError,
   checkoutPending,
+  checkoutState,
   createIntent,
   createStudent,
   createStudentError,
