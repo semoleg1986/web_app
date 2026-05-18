@@ -1,49 +1,55 @@
-# web_app (Nuxt 3)
+# web_app
 
-Минимальный frontend на Vue + Nitro.
+Parent-facing Nuxt storefront.
 
-## Архитектурный паттерн
+## Responsibility
 
-- `src/app`: глобальная инициализация/стили.
-- `src/pages`: route-страницы.
-- `src/features`: бизнес-фичи (`model/api/ui`).
-- `src/shared`: UI, lib, api, types.
-- `src/server`: Nitro handlers.
+`web_app` owns:
+- public catalog browsing
+- parent auth session UX
+- child creation during checkout
+- payment intent creation for selected student and offer
+- server-side backend proxies under `/api`
 
-Подробно: `docs/ARCHITECTURE.md`.
+## Local run
 
-## UI Preferences
-
-- Footer содержит переключатель языка (`RU/EN`).
-- Footer содержит переключатель темы (`system/light/dark`).
-- Год в footer подставляется динамически.
-
-## Локальный запуск
 ```bash
 npm install
 npm run dev
 ```
 
-Откроется на `http://localhost:3000`.
+App URL:
+- [http://localhost:3000](http://localhost:3000)
 
-## Тесты
+## Environment
+
+- [web_app/.env.example](/Users/olegsemenov/Programming/curs/web_app/.env.example)
+- [web_app/.env.local.example](/Users/olegsemenov/Programming/curs/web_app/.env.local.example)
+
+Key variables:
+- `NUXT_AUTH_SERVICE_BASE_URL`
+- `NUXT_PUBLIC_API_BASE_URL`
+- `NUXT_PUBLIC_SITE_URL`
+
+Rule:
+- browser-facing API base should stay relative (`/api`)
+- backend hostnames belong only to server-side proxy config
+
+## Tests and quality
+
 ```bash
 npm test
-```
-
-## Lint и Format
-```bash
 npm run lint
 npm run format:check
 ```
 
-Автоисправление:
+## Build
+
 ```bash
-npm run lint:fix
-npm run format
+npm run build
+npm run start
 ```
 
-## Docker
-```bash
-docker compose -f docker-compose.yml up -d --build
-```
+## Documentation
+
+- [docs/ARCHITECTURE.md](/Users/olegsemenov/Programming/curs/web_app/docs/ARCHITECTURE.md)
