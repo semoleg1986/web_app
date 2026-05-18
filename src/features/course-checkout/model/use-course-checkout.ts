@@ -100,6 +100,10 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     }
   }
 
+  function updateCreateStudentField(field: "display_name" | "email" | "phone", value: string) {
+    createStudentForm[field] = value;
+  }
+
   return {
     canCreateStudent,
     checkoutError,
@@ -116,6 +120,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     selectedStudentId,
     showCreateStudentForm,
     students,
+    updateCreateStudentField,
     user
   };
 }

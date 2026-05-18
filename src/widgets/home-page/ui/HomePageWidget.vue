@@ -1,21 +1,14 @@
 <template>
   <main class="dashboard">
     <AppShellSection class="dashboard__hero" scroll="hidden">
-      <HeroBanner
-        :title="t('page.hero.title')"
-        :subtitle="t('page.hero.subtitle')"
-      />
+      <HeroBanner :title="t('page.hero.title')" :subtitle="t('page.hero.subtitle')" />
       <div class="dashboard__status">
         <span class="dashboard__status-dot" :class="`dashboard__status-dot--${status}`" />
         <span>{{ t("page.status") }}: {{ t(`status.${status}`) }}</span>
       </div>
     </AppShellSection>
 
-    <AppShellSection
-      class="dashboard__catalog"
-      :eyebrow="t('nav.home')"
-      :title="t('catalog.title')"
-    >
+    <AppShellSection class="dashboard__catalog" :eyebrow="t('nav.home')" :title="t('catalog.title')">
       <CourseCatalogSection :courses="courses" />
     </AppShellSection>
   </main>
@@ -23,51 +16,11 @@
 
 <script setup lang="ts">
 import { CourseCatalogSection } from "~/features/course-catalog";
-import { useCourseCatalogQuery } from "~/features/course-catalog/api/use-course-catalog-query";
 import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
-import { useHealthQuery } from "~/shared/api/health";
-import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
-import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import HeroBanner from "~/shared/ui/hero-banner/HeroBanner.vue";
-import type { CourseCardItem } from "~/features/course-catalog/model/types";
+import { useHomePage } from "~/widgets/home-page/model/use-home-page";
 
-const { t } = usePreferences();
-const runtimeConfig = useRuntimeConfig();
-const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
-const title = computed(() => buildCourseTitle(t("page.hero.title")));
-
-const { data: health } = await useHealthQuery();
-const { data: catalog } = await useCourseCatalogQuery();
-
-const courses = computed<CourseCardItem[]>(() => catalog.value?.items ?? []);
-const status = computed(() => (health.value?.ok ? "ok" : "degraded"));
-const homeSchema = computed(() => ({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": `${siteUrl.value}/#website`,
-      url: siteUrl.value,
-      name: runtimeConfig.public.appName
-    },
-    {
-      "@type": "Organization",
-      "@id": `${siteUrl.value}/#org`,
-      url: siteUrl.value,
-      name: runtimeConfig.public.appName
-    },
-    {
-      "@type": "ItemList",
-      "@id": `${siteUrl.value}/#course-list`,
-      itemListElement: courses.value.map((course, index) => ({
-        "@type": "ListItem",
-        position: index + 1,
-        url: `${siteUrl.value}/courses/${course.id}`,
-        name: course.title
-      }))
-    }
-  ]
-}));
+const { courses, homeSchema, status, t, title } = await useHomePage();
 
 useSeoMeta({
   title,
