@@ -1,10 +1,6 @@
 import { useApiQuery } from "~/shared/api/use-api-query";
-import type { CourseCardItem } from '~/features/course-catalog/model/types';
-
-interface CoursesResponse {
-  items: CourseCardItem[];
-}
+import type { CourseCatalogResponse } from "~/features/course-catalog/model/contracts";
 
 export function useCourseCatalogQuery() {
-  return useApiQuery<CoursesResponse>("/courses");
+  return useApiQuery<CourseCatalogResponse>("/courses");
 }
