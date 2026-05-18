@@ -1,14 +1,14 @@
 import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
-import { useParentStudentsClient, useParentStudentsQuery } from "~/features/parent-students";
+import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
-import { usePaymentsClient } from "~/features/payments/api/payments-client";
-import type { PaymentIntentSnapshot } from "~/features/payments/api/payments-client";
+import { usePaymentsCommands } from "~/features/payments";
+import type { PaymentIntentSnapshot } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
-  const paymentsClient = usePaymentsClient();
-  const parentStudentsClient = useParentStudentsClient();
+  const paymentsCommands = usePaymentsCommands();
+  const parentStudentsCommands = useParentStudentsCommands();
   const { isAuthenticated, user } = useAuthSession();
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
@@ -56,7 +56,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     createStudentSuccess.value = false;
 
     try {
-      const created = await parentStudentsClient.createMyStudent({
+      const created = await parentStudentsCommands.createMyStudent({
         display_name: createStudentForm.display_name.trim(),
         email: createStudentForm.email.trim(),
         phone: createStudentForm.phone.trim() || null
@@ -86,7 +86,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     paymentIntent.value = null;
 
     try {
-      paymentIntent.value = await paymentsClient.createPaymentIntent({
+      paymentIntent.value = await paymentsCommands.createPaymentIntent({
         idempotency_key: `web-offer-${course.value.defaultOffer.offerId}-${selectedStudentId.value}`,
         offer_id: course.value.defaultOffer.offerId,
         parent_id: user.value.user_id,

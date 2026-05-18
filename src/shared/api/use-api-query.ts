@@ -5,13 +5,13 @@ import type { ApiProblemDetails } from "~/shared/api/types";
 import { normalizeApiError, resolveApiUrl } from "~/shared/api/http";
 
 export function useApiQuery<TResponse>(
-  path: string,
+  path: MaybeRefOrGetter<string>,
   options: UseFetchOptions<TResponse> = {}
 ) {
   const runtimeConfig = useRuntimeConfig();
-  const url = resolveApiUrl(path, runtimeConfig.public.apiBaseUrl);
+  const url = computed(() => resolveApiUrl(toValue(path), runtimeConfig.public.apiBaseUrl));
   const method = String(options.method ?? "GET").toUpperCase();
-  const key = options.key ?? `${method}:${url}`;
+  const key = options.key ?? computed(() => `${method}:${url.value}`);
   const request = useFetch<TResponse>(url, { ...options, key });
 
   return {

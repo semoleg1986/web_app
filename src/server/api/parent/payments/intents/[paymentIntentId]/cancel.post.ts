@@ -4,7 +4,7 @@ import {
   resolveServiceBaseUrl,
   unauthorizedProblem
 } from "~/server/utils/upstream-proxy";
-import type { PaymentIntentSnapshot } from "~/features/payments/api/payments-client";
+import type { PaymentIntentSnapshot } from "~/features/payments";
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig();

@@ -8,7 +8,7 @@ import {
 import type {
   CreateMyStudentPayload,
   ParentStudentItem
-} from "~/features/parent-students/api/parent-students-client";
+} from "~/features/parent-students";
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig();

@@ -4,7 +4,7 @@ import {
   resolveServiceBaseUrl,
   unauthorizedProblem
 } from "~/server/utils/upstream-proxy";
-import type { ParentStudentListResponse } from "~/features/parent-students/api/parent-students-client";
+import type { ParentStudentListResponse } from "~/features/parent-students";
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig();
