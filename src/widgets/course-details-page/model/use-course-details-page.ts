@@ -59,10 +59,19 @@ export async function useCourseDetailsPage() {
     ]
   }));
 
+  function formatPrice(price: (typeof course.value.offers)[number]["price"]) {
+    return new Intl.NumberFormat(undefined, {
+      currency: price.currency,
+      maximumFractionDigits: 0,
+      style: "currency"
+    }).format(price.salePrice);
+  }
+
   return {
     course,
     courseSchema,
     courseTitle,
-    courseUrl
+    courseUrl,
+    formatPrice
   };
 }
