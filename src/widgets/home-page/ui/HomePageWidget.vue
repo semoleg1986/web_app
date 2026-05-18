@@ -20,7 +20,7 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import HeroBanner from "~/shared/ui/hero-banner/HeroBanner.vue";
 import { useHomePage } from "~/widgets/home-page/model/use-home-page";
 
-const { courses, homeSchema, status, t, title } = await useHomePage();
+const { courses, homeSchema, status, t, title } = useHomePage();
 
 useSeoMeta({
   title,

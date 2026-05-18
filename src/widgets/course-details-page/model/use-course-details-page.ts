@@ -1,7 +1,7 @@
 import { normalizeCourseLevel, useCourseDetails } from "~/features/course-catalog";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
 
-export async function useCourseDetailsPage() {
+export function useCourseDetailsPage() {
   const route = useRoute();
   const runtimeConfig = useRuntimeConfig();
 
@@ -12,7 +12,7 @@ export async function useCourseDetailsPage() {
     throw createError({ statusCode: 404, statusMessage: "Course not found" });
   }
 
-  const { course } = await useCourseDetails(slug);
+  const { course } = useCourseDetails(slug);
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
   const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value.id}`);
   const courseTitle = computed(() => buildCourseTitle(course.value.title));

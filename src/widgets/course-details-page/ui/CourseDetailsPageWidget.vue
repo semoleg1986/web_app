@@ -35,7 +35,7 @@ import AppShellSection from "~/shared/ui/app-shell-section/AppShellSection.vue";
 import { useCourseDetailsPage } from "~/widgets/course-details-page/model/use-course-details-page";
 
 const { t } = usePreferences();
-const { course, courseSchema, courseTitle, courseUrl, formatPrice } = await useCourseDetailsPage();
+const { course, courseSchema, courseTitle, courseUrl, formatPrice } = useCourseDetailsPage();
 
 useSeoMeta({
   title: courseTitle,

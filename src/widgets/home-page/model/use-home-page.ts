@@ -4,14 +4,14 @@ import { useHealthQuery } from "~/shared/api/health";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 
-export async function useHomePage() {
+export function useHomePage() {
   const { t } = usePreferences();
   const runtimeConfig = useRuntimeConfig();
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
   const title = computed(() => buildCourseTitle(t("page.hero.title")));
 
-  const { data: health } = await useHealthQuery();
-  const { data: catalog } = await useCourseCatalogQuery();
+  const { data: health } = useHealthQuery();
+  const { data: catalog } = useCourseCatalogQuery();
 
   const courses = computed<CourseCardItem[]>(() => catalog.value?.items ?? []);
   const status = computed(() => (health.value?.ok ? "ok" : "degraded"));
