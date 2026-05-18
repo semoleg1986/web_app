@@ -2,7 +2,7 @@ import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
 import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
-import { usePaymentsCommands } from "~/features/payments";
+import { usePaymentIntentQuery, usePaymentsCommands } from "~/features/payments";
 import type { PaymentIntentSnapshot } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
 
@@ -13,9 +13,16 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
-  const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(studentsEnabled.value);
+  const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(studentsEnabled);
+  const selectedStudentsCookie = useCookie<Record<string, string>>("curs_checkout_students", {
+    default: () => ({})
+  });
+  const paymentIntentsCookie = useCookie<Record<string, string>>("curs_checkout_payment_intents", {
+    default: () => ({})
+  });
 
   const students = computed<ParentStudentItem[]>(() => studentsData.value?.items ?? []);
+  const courseKey = computed(() => course.value.courseId);
   const selectedStudentId = ref("");
   const showCreateStudentForm = ref(false);
   const createStudentPending = ref(false);
@@ -36,15 +43,56 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       createStudentForm.email.trim().length > 0
   );
 
+  const paymentIntentKey = computed(() =>
+    selectedStudentId.value ? `${courseKey.value}:${selectedStudentId.value}` : ""
+  );
+  const persistedPaymentIntentId = computed(() =>
+    paymentIntentKey.value ? paymentIntentsCookie.value[paymentIntentKey.value] ?? "" : ""
+  );
+  const {
+    data: persistedPaymentIntentData,
+    error: persistedPaymentIntentError
+  } = usePaymentIntentQuery(persistedPaymentIntentId);
+
   watch(
     students,
     (next) => {
       if (!selectedStudentId.value && next.length > 0) {
-        selectedStudentId.value = next[0].user_id;
+        const persistedStudentId = selectedStudentsCookie.value[courseKey.value];
+        selectedStudentId.value =
+          next.find((student) => student.user_id === persistedStudentId)?.user_id ?? next[0].user_id;
       }
     },
     { immediate: true }
   );
+
+  watch(selectedStudentId, (next) => {
+    if (next) {
+      selectedStudentsCookie.value = {
+        ...selectedStudentsCookie.value,
+        [courseKey.value]: next
+      };
+    }
+  });
+
+  watch(
+    persistedPaymentIntentData,
+    (next) => {
+      paymentIntent.value = next ?? null;
+    },
+    { immediate: true }
+  );
+
+  watch(persistedPaymentIntentError, (next) => {
+    if (!next || !paymentIntentKey.value) {
+      return;
+    }
+
+    const nextCache = { ...paymentIntentsCookie.value };
+    delete nextCache[paymentIntentKey.value];
+    paymentIntentsCookie.value = nextCache;
+    paymentIntent.value = null;
+  });
 
   async function createStudent() {
     if (!canCreateStudent.value) {
@@ -92,6 +140,12 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
         parent_id: user.value.user_id,
         student_id: selectedStudentId.value
       });
+      if (paymentIntent.value && paymentIntentKey.value) {
+        paymentIntentsCookie.value = {
+          ...paymentIntentsCookie.value,
+          [paymentIntentKey.value]: paymentIntent.value.payment_intent_id
+        };
+      }
     } catch (error) {
       checkoutError.value =
         error instanceof ApiRequestError ? error.message : "Failed to create payment intent";

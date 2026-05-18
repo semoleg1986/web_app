@@ -1,9 +1,12 @@
 import { useApiQuery } from "~/shared/api/use-api-query";
 import type { ParentStudentListResponse } from "~/features/parent-students/model/types";
 
-export function useParentStudentsQuery(enabled = true) {
+export function useParentStudentsQuery(enabled: MaybeRefOrGetter<boolean> = true) {
+  const resolvedEnabled = computed(() => Boolean(toValue(enabled)));
+
   return useApiQuery<ParentStudentListResponse>("/parent/me/students", {
-    immediate: enabled,
-    server: enabled
+    immediate: resolvedEnabled,
+    server: resolvedEnabled,
+    watch: [resolvedEnabled]
   });
 }
