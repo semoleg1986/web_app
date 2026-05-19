@@ -7,6 +7,7 @@ import {
 import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
+import { useSseChannel } from "~/shared/lib/realtime/use-sse-channel";
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const paymentsCommands = usePaymentsCommands();
@@ -45,6 +46,21 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     selectedStudentId,
     courseKey
   );
+
+  const streamUrl = computed(() =>
+    selectedStudentId.value
+      ? `/api/parent/payments/students/${selectedStudentId.value}/courses/${courseKey.value}/checkout-state/stream`
+      : ""
+  );
+
+  useSseChannel(streamUrl, {
+    onMessage: async () => {
+      if (checkoutPending.value || createStudentPending.value) {
+        return;
+      }
+      await refreshCheckoutState();
+    }
+  });
 
   const checkoutState = computed(() => checkoutStateData.value ?? null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
