@@ -25,6 +25,12 @@ export function useSseChannel(
     }
 
     source = new EventSource(nextUrl, { withCredentials: true });
+    source.addEventListener("update", (event) => {
+      handlers.onMessage?.((event as MessageEvent<string>).data);
+    });
+    source.addEventListener("error", () => {
+      handlers.onError?.();
+    });
     source.onmessage = (event) => {
       handlers.onMessage?.(event.data);
     };

@@ -26,10 +26,21 @@ export default defineEventHandler(async (event) => {
       return;
     }
 
-    const nextSnapshot = await fetchSnapshot();
-    if (nextSnapshot !== lastSnapshot) {
-      lastSnapshot = nextSnapshot;
-      await eventStream.push({ event: "update", data: nextSnapshot });
+    try {
+      const nextSnapshot = await fetchSnapshot();
+      if (nextSnapshot !== lastSnapshot) {
+        lastSnapshot = nextSnapshot;
+        await eventStream.push({ event: "update", data: nextSnapshot });
+      }
+    } catch (error) {
+      if (!disposed) {
+        await eventStream.push({
+          event: "error",
+          data: JSON.stringify({
+            message: error instanceof Error ? error.message : "SSE snapshot failed"
+          })
+        });
+      }
     }
   };
 
@@ -43,6 +54,7 @@ export default defineEventHandler(async (event) => {
     await eventStream.close();
   });
 
-  await tick();
-  return eventStream.send();
+  const response = eventStream.send();
+  void tick();
+  return response;
 });
