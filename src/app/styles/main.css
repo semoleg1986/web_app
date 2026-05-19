@@ -30,7 +30,9 @@ body,
 body {
   background: radial-gradient(circle at top right, #daf1ef 0%, var(--c-bg) 45%);
   color: var(--c-fg);
-  transition: background 180ms ease, color 180ms ease;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
   overflow: hidden;
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
@@ -49,7 +51,10 @@ textarea {
 
 @media (max-width: 767px) {
   body {
-    background:
-      linear-gradient(180deg, color-mix(in srgb, var(--c-bg) 92%, #d9f1ee) 0%, var(--c-bg) 38%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--c-bg) 92%, #d9f1ee) 0%,
+      var(--c-bg) 38%
+    );
   }
 }

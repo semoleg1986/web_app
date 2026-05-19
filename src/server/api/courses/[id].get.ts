@@ -126,7 +126,7 @@ export default defineEventHandler(async (event) => {
       courseId: course.course_id,
       defaultOffer: defaultCatalogOffer
         ? normalizeOffer(defaultCatalogOffer)
-        : normalizedOffers[0] ?? null,
+        : (normalizedOffers[0] ?? null),
       description: course.description ?? "",
       id: course.slug,
       lessonsCount: course.lessons_total,

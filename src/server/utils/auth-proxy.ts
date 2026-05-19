@@ -59,9 +59,7 @@ function authServiceBaseUrl() {
   const runtimeConfig = useRuntimeConfig();
 
   return String(
-    runtimeConfig.authServiceBaseUrl ||
-      runtimeConfig.public.apiBaseUrl ||
-      "http://localhost:8000"
+    runtimeConfig.authServiceBaseUrl || runtimeConfig.public.apiBaseUrl || "http://localhost:8000"
   ).replace(/\/$/, "");
 }
 
@@ -140,7 +138,7 @@ export async function proxyLogin(event: H3Event) {
           user_agent_raw:
             typeof (body as Record<string, unknown>).user_agent_raw === "string"
               ? (body as Record<string, string>).user_agent_raw
-              : userAgent ?? undefined
+              : (userAgent ?? undefined)
         }
       : body;
 

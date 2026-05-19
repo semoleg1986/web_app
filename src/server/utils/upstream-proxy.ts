@@ -1,10 +1,4 @@
-import {
-  getQuery,
-  getRequestHeader,
-  readBody,
-  setHeader,
-  setResponseStatus
-} from "h3";
+import { getQuery, getRequestHeader, readBody, setHeader, setResponseStatus } from "h3";
 import type { H3Event } from "h3";
 
 import { getAccessToken } from "~/server/utils/auth-session";

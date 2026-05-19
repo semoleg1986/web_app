@@ -8,7 +8,11 @@
       </div>
     </AppShellSection>
 
-    <AppShellSection class="dashboard__catalog" :eyebrow="t('nav.home')" :title="t('catalog.title')">
+    <AppShellSection
+      class="dashboard__catalog"
+      :eyebrow="t('nav.home')"
+      :title="t('catalog.title')"
+    >
       <CourseCatalogSection :courses="courses" :pending="catalogPending" />
     </AppShellSection>
   </main>

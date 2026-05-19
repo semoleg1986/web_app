@@ -4,10 +4,7 @@ import { useCookie } from "#app";
 
 import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
-import {
-  useParentStudentsCommands,
-  useParentStudentsQuery
-} from "~/features/parent-students";
+import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
@@ -42,8 +39,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
   const canCreateStudent = computed(
     () =>
-      createStudentForm.display_name.trim().length > 0 &&
-      createStudentForm.email.trim().length > 0
+      createStudentForm.display_name.trim().length > 0 && createStudentForm.email.trim().length > 0
   );
 
   const { data: checkoutStateData, refresh: refreshCheckoutState } = useCheckoutStateQuery(

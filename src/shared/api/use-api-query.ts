@@ -19,9 +19,7 @@ export function useApiQuery<TResponse>(
   return {
     ...request,
     apiError: computed(() =>
-      normalizeApiError(
-        request.error.value as FetchError<ApiProblemDetails> | null | undefined
-      )
+      normalizeApiError(request.error.value as FetchError<ApiProblemDetails> | null | undefined)
     )
   };
 }

@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  normalizeApiError,
-  resolveApiUrl
-} from "~/shared/api/http";
+import { normalizeApiError, resolveApiUrl } from "~/shared/api/http";
 
 describe("shared api helpers", () => {
   it("prefixes relative paths with configured base url", () => {
@@ -13,9 +10,7 @@ describe("shared api helpers", () => {
 
   it("preserves explicit api and absolute urls", () => {
     expect(resolveApiUrl("/api/courses")).toBe("/api/courses");
-    expect(resolveApiUrl("https://example.com/health")).toBe(
-      "https://example.com/health"
-    );
+    expect(resolveApiUrl("https://example.com/health")).toBe("https://example.com/health");
   });
 
   it("normalizes problem-details payloads into stable ui errors", () => {

@@ -1,8 +1,4 @@
-import type {
-  AuthLoginPayload,
-  AuthMe,
-  AuthRegisterPayload
-} from "~/features/auth/model/types";
+import type { AuthLoginPayload, AuthMe, AuthRegisterPayload } from "~/features/auth/model/types";
 import { useAuthClient } from "~/features/auth/api/auth-client";
 import { ApiRequestError } from "~/shared/api/types";
 

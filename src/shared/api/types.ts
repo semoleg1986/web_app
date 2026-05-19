@@ -8,9 +8,7 @@ export interface ApiProblemDetails {
   [key: string]: unknown;
 }
 
-export interface ApiClientError<
-  TProblem extends ApiProblemDetails = ApiProblemDetails
-> {
+export interface ApiClientError<TProblem extends ApiProblemDetails = ApiProblemDetails> {
   statusCode: number | null;
   statusMessage: string;
   problem: TProblem | null;
@@ -18,9 +16,7 @@ export interface ApiClientError<
   correlationId: string | null;
 }
 
-export class ApiRequestError<
-  TProblem extends ApiProblemDetails = ApiProblemDetails
-> extends Error {
+export class ApiRequestError<TProblem extends ApiProblemDetails = ApiProblemDetails> extends Error {
   readonly name = "ApiRequestError";
   readonly statusCode: number | null;
   readonly problem: TProblem | null;

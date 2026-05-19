@@ -5,6 +5,7 @@ Parent-facing Nuxt storefront.
 ## Responsibility
 
 `web_app` owns:
+
 - public catalog browsing
 - parent auth session UX
 - child creation during checkout
@@ -19,6 +20,7 @@ npm run dev
 ```
 
 App URL:
+
 - [http://localhost:3000](http://localhost:3000)
 
 ## Environment
@@ -27,11 +29,13 @@ App URL:
 - [web_app/.env.local.example](/Users/olegsemenov/Programming/curs/web_app/.env.local.example)
 
 Key variables:
+
 - `NUXT_AUTH_SERVICE_BASE_URL`
 - `NUXT_PUBLIC_API_BASE_URL`
 - `NUXT_PUBLIC_SITE_URL`
 
 Rule:
+
 - browser-facing API base should stay relative (`/api`)
 - backend hostnames belong only to server-side proxy config
 

@@ -2,13 +2,13 @@
   <footer class="footer">
     <div class="footer__main">
       <div class="footer__brand">
-        <strong>{{ t('app.name') }}</strong>
-        <span>© {{ year }} {{ t('footer.copyright') }}</span>
+        <strong>{{ t("app.name") }}</strong>
+        <span>© {{ year }} {{ t("footer.copyright") }}</span>
       </div>
 
       <div class="footer__controls">
         <div class="control">
-          <span class="control__label">{{ t('footer.language') }}</span>
+          <span class="control__label">{{ t("footer.language") }}</span>
           <div class="chip-group">
             <AppChip
               v-for="code in locales"
@@ -22,25 +22,16 @@
         </div>
 
         <div class="control">
-          <span class="control__label">{{ t('footer.theme') }}</span>
+          <span class="control__label">{{ t("footer.theme") }}</span>
           <div class="chip-group">
-            <AppChip
-              :active="themeMode === 'system'"
-              @click="setThemeMode('system')"
-            >
-              {{ t('footer.theme.system') }}
+            <AppChip :active="themeMode === 'system'" @click="setThemeMode('system')">
+              {{ t("footer.theme.system") }}
             </AppChip>
-            <AppChip
-              :active="themeMode === 'light'"
-              @click="setThemeMode('light')"
-            >
-              {{ t('footer.theme.light') }}
+            <AppChip :active="themeMode === 'light'" @click="setThemeMode('light')">
+              {{ t("footer.theme.light") }}
             </AppChip>
-            <AppChip
-              :active="themeMode === 'dark'"
-              @click="setThemeMode('dark')"
-            >
-              {{ t('footer.theme.dark') }}
+            <AppChip :active="themeMode === 'dark'" @click="setThemeMode('dark')">
+              {{ t("footer.theme.dark") }}
             </AppChip>
           </div>
         </div>
@@ -50,11 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import type { LocaleCode } from '~/shared/lib/preferences/types';
-import { usePreferences } from '~/shared/lib/preferences/use-preferences';
+import type { LocaleCode } from "~/shared/lib/preferences/types";
+import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppChip from "~/shared/ui/app-chip/AppChip.vue";
 
-const locales: LocaleCode[] = ['ru', 'en'];
+const locales: LocaleCode[] = ["ru", "en"];
 const year = new Date().getFullYear();
 
 const { locale, themeMode, setLocale, setThemeMode, t } = usePreferences();
@@ -113,5 +104,4 @@ const { locale, themeMode, setLocale, setThemeMode, t } = usePreferences();
     display: none;
   }
 }
-
 </style>

@@ -1,9 +1,5 @@
 <template>
-  <button
-    class="app-chip"
-    :class="{ 'app-chip--active': active }"
-    :type="type"
-  >
+  <button class="app-chip" :class="{ 'app-chip--active': active }" :type="type">
     <slot />
   </button>
 </template>

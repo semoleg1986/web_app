@@ -13,9 +13,7 @@ export function resolveApiUrl(path: string, baseUrl = "/api") {
     return path;
   }
 
-  const normalizedBaseUrl = baseUrl.endsWith("/")
-    ? baseUrl.slice(0, -1)
-    : baseUrl;
+  const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
   return `${normalizedBaseUrl}${normalizedPath}`;
@@ -33,14 +31,9 @@ export function normalizeApiError(
   return {
     statusCode: error.statusCode ?? problem?.status ?? null,
     statusMessage:
-      problem?.detail ??
-      problem?.title ??
-      error.statusMessage ??
-      error.message ??
-      "Request failed",
+      problem?.detail ?? problem?.title ?? error.statusMessage ?? error.message ?? "Request failed",
     problem,
     requestId: typeof problem?.request_id === "string" ? problem.request_id : null,
-    correlationId:
-      typeof problem?.correlation_id === "string" ? problem.correlation_id : null
+    correlationId: typeof problem?.correlation_id === "string" ? problem.correlation_id : null
   };
 }

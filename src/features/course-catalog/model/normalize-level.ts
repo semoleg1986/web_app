@@ -1,4 +1,6 @@
-export function normalizeCourseLevel(level: string): "beginner" | "intermediate" | "advanced" | "unknown" {
+export function normalizeCourseLevel(
+  level: string
+): "beginner" | "intermediate" | "advanced" | "unknown" {
   const value = level.trim().toLowerCase();
 
   if (value === "beginner") {

@@ -4,15 +4,30 @@
     <p v-if="showEmptyState">{{ t("course.checkout.noStudents") }}</p>
 
     <AppFormField :label="t('course.checkout.childName')">
-      <input :value="form.display_name" type="text" autocomplete="name" @input="updateField('display_name', $event)" />
+      <input
+        :value="form.display_name"
+        type="text"
+        autocomplete="name"
+        @input="updateField('display_name', $event)"
+      />
     </AppFormField>
 
     <AppFormField :label="t('course.checkout.childEmail')">
-      <input :value="form.email" type="email" autocomplete="email" @input="updateField('email', $event)" />
+      <input
+        :value="form.email"
+        type="email"
+        autocomplete="email"
+        @input="updateField('email', $event)"
+      />
     </AppFormField>
 
     <AppFormField :label="t('course.checkout.childPhone')">
-      <input :value="form.phone" type="tel" autocomplete="tel" @input="updateField('phone', $event)" />
+      <input
+        :value="form.phone"
+        type="tel"
+        autocomplete="tel"
+        @input="updateField('phone', $event)"
+      />
     </AppFormField>
 
     <AppButton :disabled="pending || !canSubmit" block @click="$emit('submit')">
@@ -20,7 +35,9 @@
     </AppButton>
 
     <p v-if="errorMessage" class="checkout-card__error">{{ errorMessage }}</p>
-    <p v-if="success" class="checkout-card__success-text">{{ t("course.checkout.childSuccess") }}</p>
+    <p v-if="success" class="checkout-card__success-text">
+      {{ t("course.checkout.childSuccess") }}
+    </p>
   </div>
 </template>
 

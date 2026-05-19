@@ -24,7 +24,9 @@ export default defineEventHandler(async (event) => {
     .filter((course) => typeof course.slug === "string" && course.slug.length > 0)
     .map((course) => `/courses/${course.slug}`);
 
-  const urls = [...staticPaths, ...coursePaths].map((path) => `<url><loc>${siteUrl}${path}</loc></url>`);
+  const urls = [...staticPaths, ...coursePaths].map(
+    (path) => `<url><loc>${siteUrl}${path}</loc></url>`
+  );
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',

@@ -1,11 +1,7 @@
 <template>
   <button
     class="app-button"
-    :class="[
-      `app-button--${variant}`,
-      `app-button--${size}`,
-      { 'app-button--block': block }
-    ]"
+    :class="[`app-button--${variant}`, `app-button--${size}`, { 'app-button--block': block }]"
     :disabled="disabled"
     :type="type"
   >

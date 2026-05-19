@@ -6,7 +6,9 @@
         <h3>
           <NuxtLink class="card-link" :to="`/courses/${course.id}`">{{ course.title }}</NuxtLink>
         </h3>
-        <p>{{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}</p>
+        <p>
+          {{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}
+        </p>
         <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
         <p>{{ t("catalog.price") }}: {{ formatPrice(course.offer.price) }}</p>
         <p>{{ t("catalog.offers") }}: {{ course.offersCount }}</p>

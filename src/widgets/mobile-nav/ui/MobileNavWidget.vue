@@ -1,6 +1,10 @@
 <template>
   <nav class="mobile-nav" aria-label="Mobile navigation">
-    <NuxtLink class="mobile-nav__item" :class="{ 'mobile-nav__item--active': route.path === '/' }" to="/">
+    <NuxtLink
+      class="mobile-nav__item"
+      :class="{ 'mobile-nav__item--active': route.path === '/' }"
+      to="/"
+    >
       <span class="mobile-nav__icon">⌂</span>
       <span>{{ t("nav.home") }}</span>
     </NuxtLink>

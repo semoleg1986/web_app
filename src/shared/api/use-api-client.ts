@@ -17,10 +17,7 @@ export function useApiClient() {
     options: ApiRequestOptions<TBody> = {}
   ) {
     try {
-      return await $fetch<TResponse>(
-        resolveApiUrl(path, runtimeConfig.public.apiBaseUrl),
-        options
-      );
+      return await $fetch<TResponse>(resolveApiUrl(path, runtimeConfig.public.apiBaseUrl), options);
     } catch (error) {
       const normalized = normalizeApiError(
         error as FetchError<ApiProblemDetails> | null | undefined
@@ -39,11 +36,7 @@ export function useApiClient() {
     get<TResponse>(path: string, headers?: FetchOptions["headers"]) {
       return request<TResponse>(path, { headers, method: "GET" });
     },
-    post<TResponse, TBody>(
-      path: string,
-      body: TBody,
-      headers?: FetchOptions["headers"]
-    ) {
+    post<TResponse, TBody>(path: string, body: TBody, headers?: FetchOptions["headers"]) {
       return request<TResponse, TBody>(path, { body, headers, method: "POST" });
     }
   };

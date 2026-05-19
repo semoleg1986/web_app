@@ -15,10 +15,10 @@ export function useAuthClient() {
       email: string;
       phone?: string | null;
     }) {
-      return api.post<unknown, { display_name?: string | null; email: string; phone?: string | null }>(
-        "/user/me",
-        payload
-      );
+      return api.post<
+        unknown,
+        { display_name?: string | null; email: string; phone?: string | null }
+      >("/user/me", payload);
     },
     getCurrentUser() {
       return api.get<AuthMe>("/auth/me");

@@ -234,7 +234,9 @@ function main() {
   const rawWidgetName = args.widget;
 
   if (!sliceType || !rawName) {
-    fail("Usage: node scripts/generate-web-slice.mjs --app-dir <dir> --type <feature|widget|page> --name <slice-name> [--widget <widget-slice>] [--dry-run]");
+    fail(
+      "Usage: node scripts/generate-web-slice.mjs --app-dir <dir> --type <feature|widget|page> --name <slice-name> [--widget <widget-slice>] [--dry-run]"
+    );
   }
 
   const srcDir = path.join(appDir, "src");
@@ -266,13 +268,17 @@ function main() {
       fail("Page route is empty after normalization.");
     }
 
-    const widgetName = rawWidgetName ? toKebabCase(rawWidgetName) : inferWidgetNameFromPageRoute(pageRoute);
+    const widgetName = rawWidgetName
+      ? toKebabCase(rawWidgetName)
+      : inferWidgetNameFromPageRoute(pageRoute);
     createPageSlice({ appDir, pageRoute, widgetName, dryRun });
   } else {
     fail(`Unsupported type "${sliceType}". Use "feature", "widget" or "page".`);
   }
 
-  console.log(`${dryRun ? "[dry-run] " : ""}Generated ${sliceType} slice "${rawName}" in ${appDir}`);
+  console.log(
+    `${dryRun ? "[dry-run] " : ""}Generated ${sliceType} slice "${rawName}" in ${appDir}`
+  );
 }
 
 main();

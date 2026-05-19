@@ -51,7 +51,13 @@ import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppButton from "~/shared/ui/app-button/AppButton.vue";
 
 const { logout, pending, user } = useAuthSession();
-const { closePanel, mode: authPanelMode, open: authPanelOpen, openLogin, openRegister } = useAuthPanel();
+const {
+  closePanel,
+  mode: authPanelMode,
+  open: authPanelOpen,
+  openLogin,
+  openRegister
+} = useAuthPanel();
 const { t } = usePreferences();
 
 async function handleLogout() {
