@@ -1,5 +1,8 @@
 import { createEventStream, fetchWithEvent } from "h3";
 
+const SNAPSHOT_INTERVAL_MS = 5000;
+const HEARTBEAT_INTERVAL_MS = 15000;
+
 export default defineEventHandler(async (event) => {
   const studentId = getRouterParam(event, "studentId");
   const courseId = getRouterParam(event, "courseId");
@@ -44,13 +47,28 @@ export default defineEventHandler(async (event) => {
     }
   };
 
+  const heartbeat = async () => {
+    if (disposed) {
+      return;
+    }
+
+    await eventStream.push({
+      event: "heartbeat",
+      data: JSON.stringify({ ts: new Date().toISOString() })
+    });
+  };
+
   const interval = setInterval(() => {
     void tick();
-  }, 5000);
+  }, SNAPSHOT_INTERVAL_MS);
+  const heartbeatInterval = setInterval(() => {
+    void heartbeat();
+  }, HEARTBEAT_INTERVAL_MS);
 
   eventStream.onClosed(async () => {
     disposed = true;
     clearInterval(interval);
+    clearInterval(heartbeatInterval);
     await eventStream.close();
   });
 
