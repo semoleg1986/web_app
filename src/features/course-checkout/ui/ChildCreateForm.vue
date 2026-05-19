@@ -29,7 +29,7 @@ import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppButton from "~/shared/ui/app-button/AppButton.vue";
 import AppFormField from "~/shared/ui/app-form-field/AppFormField.vue";
 
-const props = defineProps<{
+defineProps<{
   canSubmit: boolean;
   errorMessage: string;
   form: {

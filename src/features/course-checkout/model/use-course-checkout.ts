@@ -1,3 +1,7 @@
+import { computed, reactive, ref, watch } from "vue";
+import type { Ref } from "vue";
+import { useCookie } from "#app";
+
 import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
 import {

@@ -1,7 +1,11 @@
+import { onBeforeUnmount, toValue, watch } from "vue";
+import type { MaybeRefOrGetter } from "vue";
+
 export function useSseChannel(
   url: MaybeRefOrGetter<string>,
   handlers: {
-    onMessage?: (payload: string) => void;
+    // eslint-disable-next-line no-unused-vars
+    onMessage?: (message: string) => void | Promise<void>;
     onError?: () => void;
   } = {}
 ) {

@@ -1,3 +1,5 @@
+import { computed, toValue } from "vue";
+import type { MaybeRefOrGetter } from "vue";
 import type { UseFetchOptions } from "nuxt/app";
 import type { FetchError } from "ofetch";
 

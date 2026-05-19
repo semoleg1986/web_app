@@ -1,7 +1,12 @@
+import { computed, toValue } from "vue";
+import type { MaybeRefOrGetter } from "vue";
+
 import { useApiQuery } from "~/shared/api/use-api-query";
 import type { PaymentIntentSnapshot } from "~/features/payments/model/types";
 
-export function usePaymentIntentQuery(paymentIntentId: MaybeRefOrGetter<string | null | undefined>) {
+export function usePaymentIntentQuery(
+  paymentIntentId: MaybeRefOrGetter<string | null | undefined>
+) {
   const resolvedPaymentIntentId = computed(() => toValue(paymentIntentId)?.trim() || "");
 
   return useApiQuery<PaymentIntentSnapshot>(

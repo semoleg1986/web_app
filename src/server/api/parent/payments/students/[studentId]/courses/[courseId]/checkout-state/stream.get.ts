@@ -1,3 +1,5 @@
+import { createEventStream, fetchWithEvent } from "h3";
+
 export default defineEventHandler(async (event) => {
   const studentId = getRouterParam(event, "studentId");
   const courseId = getRouterParam(event, "courseId");

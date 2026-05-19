@@ -37,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { toRef } from "vue";
+
 import type { CourseDetailsItem } from "~/features/course-catalog";
 import { useCourseCheckout } from "~/features/course-checkout/model/use-course-checkout";
 import ChildCreateForm from "~/features/course-checkout/ui/ChildCreateForm.vue";
