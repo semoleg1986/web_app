@@ -33,6 +33,20 @@ export interface CourseAccessGrantSnapshot {
 export interface CheckoutActionsSnapshot {
   can_create_payment_intent: boolean;
   can_retry_payment: boolean;
+  next_action: string;
+  resume_payment_intent_id: string | null;
+}
+
+export interface CheckoutOfferSnapshot {
+  offer_id: string;
+  course_id: string;
+  base_price: number;
+  final_price: number;
+  bonus_amount: number;
+  currency: string;
+  source: string;
+  payment_intent_id: string | null;
+  access_grant_id: string | null;
 }
 
 export interface CheckoutStateSnapshot {
@@ -40,6 +54,8 @@ export interface CheckoutStateSnapshot {
   student_id: string;
   course_id: string;
   checkout_state: string;
+  selected_offer: CheckoutOfferSnapshot | null;
+  purchased_offer: CheckoutOfferSnapshot | null;
   latest_payment_intent: PaymentIntentSnapshot | null;
   access_grant: CourseAccessGrantSnapshot | null;
   available_actions: CheckoutActionsSnapshot;

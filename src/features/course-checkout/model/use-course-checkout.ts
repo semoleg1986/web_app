@@ -69,6 +69,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const checkoutState = computed(() => checkoutStateData.value ?? null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
   const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
+  const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
+  const purchasedOffer = computed(() => checkoutState.value?.purchased_offer ?? null);
+  const nextAction = computed(
+    () => checkoutState.value?.available_actions.next_action ?? "create_payment_intent"
+  );
 
   watch(
     students,
@@ -165,8 +170,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     createStudentSuccess,
     isAuthenticated,
     isParent,
+    nextAction,
     paymentIntent,
+    purchasedOffer,
     selectedStudentId,
+    selectedOffer,
     showCreateStudentForm,
     students,
     updateCreateStudentField,

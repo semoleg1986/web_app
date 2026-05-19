@@ -23,9 +23,12 @@
         :access-grant="accessGrant"
         :checkout-state="checkoutState"
         :error-message="checkoutError"
+        :next-action="nextAction"
         :payment-intent="paymentIntent"
         :pending="checkoutPending"
+        :purchased-offer="purchasedOffer"
         :selected-student-id="selectedStudentId"
+        :selected-offer="selectedOffer"
         :show-create-student-form="showCreateStudentForm"
         :students="students"
         @open-create-child="showCreateStudentForm = true"
@@ -66,8 +69,11 @@ const {
   createStudentSuccess,
   isAuthenticated,
   isParent,
+  nextAction,
   paymentIntent,
+  purchasedOffer,
   selectedStudentId,
+  selectedOffer,
   showCreateStudentForm,
   students,
   updateCreateStudentField
