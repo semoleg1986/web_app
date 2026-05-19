@@ -36,6 +36,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   });
   const checkoutPending = ref(false);
   const checkoutError = ref("");
+  const sseRefreshQueued = ref(false);
 
   const canCreateStudent = computed(
     () =>
@@ -53,9 +54,20 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       : ""
   );
 
+  const isSseRefreshBlocked = computed(() => checkoutPending.value || createStudentPending.value);
+
+  watch(isSseRefreshBlocked, async (blocked) => {
+    if (blocked || !sseRefreshQueued.value) {
+      return;
+    }
+    sseRefreshQueued.value = false;
+    await refreshCheckoutState();
+  });
+
   useSseChannel(streamUrl, {
     onMessage: async () => {
-      if (checkoutPending.value || createStudentPending.value) {
+      if (isSseRefreshBlocked.value) {
+        sseRefreshQueued.value = true;
         return;
       }
       await refreshCheckoutState();
