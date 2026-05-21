@@ -13,15 +13,16 @@ import { useSseChannel } from "~/shared/lib/realtime/use-sse-channel";
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const paymentsCommands = usePaymentsCommands();
   const parentStudentsCommands = useParentStudentsCommands();
-  const { isAuthenticated, user } = useAuthSession();
+  const { initialized, isAuthenticated, user } = useAuthSession();
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
   const currentParentUserId = computed(() => user.value?.user_id ?? "");
-  const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(
-    studentsEnabled,
-    currentParentUserId
-  );
+  const {
+    data: studentsData,
+    pending: studentsPending,
+    refresh: refreshStudents
+  } = useParentStudentsQuery(studentsEnabled, currentParentUserId);
   const selectedStudentsCookie = useCookie<Record<string, string>>("curs_checkout_students", {
     default: () => ({})
   });
@@ -47,13 +48,23 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       createStudentForm.display_name.trim().length > 0 && createStudentForm.email.trim().length > 0
   );
 
+  const checkoutStateEnabled = computed(
+    () =>
+      initialized.value &&
+      studentsEnabled.value &&
+      !studentsPending.value &&
+      selectedStudentId.value.trim().length > 0 &&
+      courseKey.value.trim().length > 0
+  );
+
   const { data: checkoutStateData, refresh: refreshCheckoutState } = useCheckoutStateQuery(
     selectedStudentId,
-    courseKey
+    courseKey,
+    checkoutStateEnabled
   );
 
   const streamUrl = computed(() =>
-    selectedStudentId.value
+    checkoutStateEnabled.value
       ? `/api/parent/payments/students/${selectedStudentId.value}/courses/${courseKey.value}/checkout-state/stream`
       : ""
   );

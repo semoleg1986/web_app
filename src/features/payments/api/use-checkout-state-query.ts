@@ -6,20 +6,24 @@ import type { CheckoutStateSnapshot } from "~/features/payments/model/types";
 
 export function useCheckoutStateQuery(
   studentId: MaybeRefOrGetter<string | null | undefined>,
-  courseId: MaybeRefOrGetter<string | null | undefined>
+  courseId: MaybeRefOrGetter<string | null | undefined>,
+  enabledOverride: MaybeRefOrGetter<boolean> = true
 ) {
   const resolvedStudentId = computed(() => toValue(studentId)?.trim() || "");
   const resolvedCourseId = computed(() => toValue(courseId)?.trim() || "");
+  const overrideEnabled = computed(() => Boolean(toValue(enabledOverride)));
   const enabled = computed(
-    () => resolvedStudentId.value.length > 0 && resolvedCourseId.value.length > 0
+    () =>
+      overrideEnabled.value &&
+      resolvedStudentId.value.length > 0 &&
+      resolvedCourseId.value.length > 0
   );
 
   return useApiQuery<CheckoutStateSnapshot>(
-    computed(
-      () =>
-        enabled.value
-          ? `/parent/payments/students/${resolvedStudentId.value}/courses/${resolvedCourseId.value}/checkout-state`
-          : null
+    computed(() =>
+      enabled.value
+        ? `/parent/payments/students/${resolvedStudentId.value}/courses/${resolvedCourseId.value}/checkout-state`
+        : null
     ),
     {
       immediate: enabled,
@@ -29,7 +33,7 @@ export function useCheckoutStateQuery(
           : "GET:/parent/payments/students/__empty__/courses/__empty__/checkout-state"
       ),
       server: false,
-      watch: [resolvedStudentId, resolvedCourseId, enabled]
+      watch: [resolvedStudentId, resolvedCourseId, overrideEnabled, enabled]
     }
   );
 }
