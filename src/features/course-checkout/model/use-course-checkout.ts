@@ -17,7 +17,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
-  const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(studentsEnabled);
+  const currentParentUserId = computed(() => user.value?.user_id ?? "");
+  const { data: studentsData, refresh: refreshStudents } = useParentStudentsQuery(
+    studentsEnabled,
+    currentParentUserId
+  );
   const selectedStudentsCookie = useCookie<Record<string, string>>("curs_checkout_students", {
     default: () => ({})
   });
@@ -86,15 +90,28 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   watch(
     students,
     (next) => {
-      if (!selectedStudentId.value && next.length > 0) {
-        const persistedStudentId = selectedStudentsCookie.value[courseKey.value];
-        selectedStudentId.value =
-          next.find((student) => student.user_id === persistedStudentId)?.user_id ??
-          next[0].user_id;
+      if (next.length === 0) {
+        selectedStudentId.value = "";
+        return;
       }
+
+      const hasSelectedStudent = next.some(
+        (student) => student.user_id === selectedStudentId.value
+      );
+      if (hasSelectedStudent) {
+        return;
+      }
+
+      const persistedStudentId = selectedStudentsCookie.value[courseKey.value];
+      selectedStudentId.value =
+        next.find((student) => student.user_id === persistedStudentId)?.user_id ?? next[0].user_id;
     },
     { immediate: true }
   );
+
+  watch(currentParentUserId, () => {
+    selectedStudentId.value = "";
+  });
 
   watch(selectedStudentId, (next) => {
     if (next) {
