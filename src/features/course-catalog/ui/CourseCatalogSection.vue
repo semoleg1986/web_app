@@ -4,7 +4,7 @@
     <ul v-if="courses.length > 0" class="grid">
       <AppCard v-for="course in courses" :key="course.id" tag="li" class="card">
         <h3>
-          <NuxtLink class="card-link" :to="`/courses/${course.id}`" no-prefetch>
+          <NuxtLink class="card-link" :to="courseHref(course)" no-prefetch>
             {{ course.title }}
           </NuxtLink>
         </h3>
@@ -14,7 +14,7 @@
         <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
         <p>{{ t("catalog.price") }}: {{ formatPrice(course.offer.price) }}</p>
         <p>{{ t("catalog.offers") }}: {{ course.offersCount }}</p>
-        <NuxtLink class="open-link" :to="`/courses/${course.id}`" no-prefetch>
+        <NuxtLink class="open-link" :to="courseHref(course)" no-prefetch>
           {{ t("catalog.open") }}
         </NuxtLink>
       </AppCard>
@@ -27,6 +27,7 @@
 <script setup lang="ts">
 import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
+import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
@@ -43,6 +44,9 @@ const formatPrice = (price: CourseCardItem["offer"]["price"]) =>
     maximumFractionDigits: 0,
     style: "currency"
   }).format(price.salePrice);
+
+const courseHref = (course: CourseCardItem) =>
+  `/courses/${resolveCourseRouteId(course.id, course.courseId)}`;
 </script>
 
 <style scoped>
