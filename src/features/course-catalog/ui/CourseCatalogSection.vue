@@ -4,7 +4,9 @@
     <ul v-if="courses.length > 0" class="grid">
       <AppCard v-for="course in courses" :key="course.id" tag="li" class="card">
         <h3>
-          <NuxtLink class="card-link" :to="`/courses/${course.id}`">{{ course.title }}</NuxtLink>
+          <NuxtLink class="card-link" :to="`/courses/${course.id}`" no-prefetch>
+            {{ course.title }}
+          </NuxtLink>
         </h3>
         <p>
           {{ t("catalog.level") }}: {{ t(`catalog.level.${normalizeCourseLevel(course.level)}`) }}
@@ -12,7 +14,9 @@
         <p>{{ t("catalog.lessons") }}: {{ course.lessonsCount }}</p>
         <p>{{ t("catalog.price") }}: {{ formatPrice(course.offer.price) }}</p>
         <p>{{ t("catalog.offers") }}: {{ course.offersCount }}</p>
-        <NuxtLink class="open-link" :to="`/courses/${course.id}`">{{ t("catalog.open") }}</NuxtLink>
+        <NuxtLink class="open-link" :to="`/courses/${course.id}`" no-prefetch>
+          {{ t("catalog.open") }}
+        </NuxtLink>
       </AppCard>
     </ul>
     <p v-else-if="pending" class="empty">Loading courses...</p>

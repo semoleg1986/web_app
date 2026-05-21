@@ -1,4 +1,5 @@
 import { useCourseCatalogQuery } from "~/features/course-catalog/api/use-course-catalog-query";
+import { isValidCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
 import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { useHealthQuery } from "~/shared/api/health";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
@@ -24,7 +25,9 @@ export function useHomePage() {
     { immediate: true }
   );
 
-  const courses = computed<CourseCardItem[]>(() => catalog.value?.items ?? catalogCache.value);
+  const courses = computed<CourseCardItem[]>(() =>
+    (catalog.value?.items ?? catalogCache.value).filter((course) => isValidCourseRouteId(course.id))
+  );
   const status = computed(() => (health.value?.ok ? "ok" : "degraded"));
   const homeSchema = computed(() => ({
     "@context": "https://schema.org",
