@@ -1,5 +1,8 @@
 import { useCourseCatalogQuery } from "~/features/course-catalog/api/use-course-catalog-query";
-import { isValidCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
+import {
+  isValidCourseRouteId,
+  resolveCourseRouteId
+} from "~/features/course-catalog/model/resolve-course-route-id";
 import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { useHealthQuery } from "~/shared/api/health";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
@@ -50,7 +53,7 @@ export function useHomePage() {
         itemListElement: courses.value.map((course, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          url: `${siteUrl.value}/courses/${course.id}`,
+          url: `${siteUrl.value}/courses/${resolveCourseRouteId(course.id, course.courseId)}`,
           name: course.title
         }))
       }
