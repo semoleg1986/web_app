@@ -3,6 +3,7 @@ import {
   proxyJsonRequest,
   resolveServiceBaseUrl
 } from "~/server/utils/upstream-proxy";
+import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
 
 interface UpstreamPublicCourseCard {
   course_id: string;
@@ -81,7 +82,7 @@ export default defineEventHandler(async (event) => {
         return {
           courseId: item.course_id,
           description: course.description ?? item.description_short,
-          id: course.slug,
+          id: resolveCourseRouteId(course.slug, item.course_id),
           lessonsCount: item.lessons_count,
           level: item.level,
           offer: {

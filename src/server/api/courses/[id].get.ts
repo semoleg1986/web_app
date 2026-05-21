@@ -5,6 +5,7 @@ import {
   proxyJsonRequest,
   resolveServiceBaseUrl
 } from "~/server/utils/upstream-proxy";
+import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
 
 interface UpstreamPublicCourseDetails {
   course_id: string;
@@ -128,7 +129,7 @@ export default defineEventHandler(async (event) => {
         ? normalizeOffer(defaultCatalogOffer)
         : (normalizedOffers[0] ?? null),
       description: course.description ?? "",
-      id: course.slug,
+      id: resolveCourseRouteId(course.slug, course.course_id),
       lessonsCount: course.lessons_total,
       level: course.level,
       offers: normalizedOffers,

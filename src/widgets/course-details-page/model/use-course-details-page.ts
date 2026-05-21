@@ -1,4 +1,5 @@
 import { normalizeCourseLevel, useCourseDetails } from "~/features/course-catalog";
+import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
 
 export function useCourseDetailsPage() {
@@ -14,7 +15,10 @@ export function useCourseDetailsPage() {
 
   const { course, pending } = useCourseDetails(slug);
   const siteUrl = computed(() => String(runtimeConfig.public.siteUrl || "http://localhost:3000"));
-  const courseUrl = computed(() => `${siteUrl.value}/courses/${course.value?.id ?? slug}`);
+  const courseRouteId = computed(() =>
+    course.value ? resolveCourseRouteId(course.value.id, course.value.courseId) : slug
+  );
+  const courseUrl = computed(() => `${siteUrl.value}/courses/${courseRouteId.value}`);
   const courseTitle = computed(() => buildCourseTitle(course.value?.title ?? "Course"));
 
   const courseSchema = computed(() => ({
