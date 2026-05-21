@@ -17,7 +17,9 @@ export function useCheckoutStateQuery(
   return useApiQuery<CheckoutStateSnapshot>(
     computed(
       () =>
-        `/parent/payments/students/${resolvedStudentId.value}/courses/${resolvedCourseId.value}/checkout-state`
+        enabled.value
+          ? `/parent/payments/students/${resolvedStudentId.value}/courses/${resolvedCourseId.value}/checkout-state`
+          : null
     ),
     {
       immediate: enabled,
