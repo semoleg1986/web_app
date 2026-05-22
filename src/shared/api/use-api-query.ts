@@ -1,5 +1,6 @@
 import { computed, toValue } from "vue";
 import type { MaybeRefOrGetter } from "vue";
+import { useFetch, useRequestFetch } from "nuxt/app";
 import type { UseFetchOptions } from "nuxt/app";
 import type { FetchError } from "ofetch";
 
@@ -24,10 +25,20 @@ export function useApiQuery<TResponse>(
   });
   const method = String(options.method ?? "GET").toUpperCase();
   const key = options.key ?? computed(() => `${method}:${url.value ?? "__disabled__"}`);
-  const request = useFetch<TResponse>(() => url.value ?? "/__disabled__", {
+  const requestFetch =
+    import.meta.server && !options.$fetch ? useRequestFetch() : globalThis.$fetch;
+  const guardedFetch: typeof globalThis.$fetch = async (request, fetchOptions) => {
+    if (typeof request !== "string" || request.trim().length === 0) {
+      return undefined as TResponse;
+    }
+    return requestFetch<TResponse>(request, fetchOptions);
+  };
+
+  const request = useFetch<TResponse>(() => url.value as string, {
     ...options,
     immediate: options.immediate ?? isEnabled,
-    key
+    key,
+    $fetch: guardedFetch
   });
 
   return {
