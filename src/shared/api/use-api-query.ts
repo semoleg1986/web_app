@@ -14,13 +14,13 @@ export function useApiQuery<TResponse>(
   const url = computed(() => {
     const resolvedPath = toValue(path);
     if (!resolvedPath) {
-      return null;
+      return undefined;
     }
     return resolveApiUrl(resolvedPath, runtimeConfig.public.apiBaseUrl);
   });
   const method = String(options.method ?? "GET").toUpperCase();
   const key = options.key ?? computed(() => `${method}:${url.value ?? "__disabled__"}`);
-  const request = useFetch<TResponse>(url as never, { ...options, key });
+  const request = useFetch<TResponse>(() => url.value, { ...options, key });
 
   return {
     ...request,
