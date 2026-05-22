@@ -11,6 +11,10 @@ export function useApiQuery<TResponse>(
   options: UseFetchOptions<TResponse> = {}
 ) {
   const runtimeConfig = useRuntimeConfig();
+  const isEnabled = computed(() => {
+    const resolvedPath = toValue(path);
+    return typeof resolvedPath === "string" && resolvedPath.trim().length > 0;
+  });
   const url = computed(() => {
     const resolvedPath = toValue(path);
     if (!resolvedPath) {
@@ -20,7 +24,11 @@ export function useApiQuery<TResponse>(
   });
   const method = String(options.method ?? "GET").toUpperCase();
   const key = options.key ?? computed(() => `${method}:${url.value ?? "__disabled__"}`);
-  const request = useFetch<TResponse>(() => url.value, { ...options, key });
+  const request = useFetch<TResponse>(() => url.value ?? "/__disabled__", {
+    ...options,
+    immediate: options.immediate ?? isEnabled,
+    key
+  });
 
   return {
     ...request,
