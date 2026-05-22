@@ -1,4 +1,4 @@
-import { createEventStream, fetchWithEvent } from "h3";
+import { createEventStream, fetchWithEvent, getRequestURL } from "h3";
 
 const SNAPSHOT_INTERVAL_MS = 5000;
 const HEARTBEAT_INTERVAL_MS = 15000;
@@ -6,6 +6,7 @@ const HEARTBEAT_INTERVAL_MS = 15000;
 export default defineEventHandler(async (event) => {
   const studentId = getRouterParam(event, "studentId");
   const courseId = getRouterParam(event, "courseId");
+  const requestOrigin = getRequestURL(event).origin;
 
   if (!studentId || !courseId) {
     throw createError({ statusCode: 400, statusMessage: "Missing route params" });
@@ -16,10 +17,11 @@ export default defineEventHandler(async (event) => {
   let lastSnapshot = "";
 
   const fetchSnapshot = async () => {
-    const snapshot = await fetchWithEvent(
-      event,
-      `/api/parent/payments/students/${studentId}/courses/${courseId}/checkout-state`
+    const snapshotUrl = new URL(
+      `/api/parent/payments/students/${studentId}/courses/${courseId}/checkout-state`,
+      requestOrigin
     );
+    const snapshot = await fetchWithEvent(event, snapshotUrl.toString());
 
     return JSON.stringify(snapshot);
   };
