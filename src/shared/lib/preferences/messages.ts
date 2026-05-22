@@ -38,6 +38,9 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.submit": "Создать payment intent",
     "course.checkout.pending": "Создаем intent...",
     "course.checkout.success": "Payment intent создан.",
+    "course.checkout.rejected": "Платеж отклонен",
+    "course.checkout.retryHint":
+      "Можно создать новый payment intent и отправить на повторную проверку.",
     "course.checkout.intent": "Intent",
     "course.checkout.total": "Итого",
     "course.checkout.selectedOffer": "Выбранный offer",
@@ -106,6 +109,9 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.submit": "Create payment intent",
     "course.checkout.pending": "Creating intent...",
     "course.checkout.success": "Payment intent created.",
+    "course.checkout.rejected": "Payment rejected",
+    "course.checkout.retryHint":
+      "You can create a new payment intent and send it for review again.",
     "course.checkout.intent": "Intent",
     "course.checkout.total": "Total",
     "course.checkout.selectedOffer": "Selected offer",

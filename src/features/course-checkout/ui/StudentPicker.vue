@@ -41,10 +41,25 @@
     </div>
 
     <div
+      v-if="paymentIntent && checkoutState?.checkout_state === 'payment_rejected'"
+      class="checkout-card__rejected"
+    >
+      <strong>{{ t("course.checkout.rejected") }}</strong>
+      <p>{{ t("course.checkout.intent") }}: {{ paymentIntent.payment_intent_id }}</p>
+      <p>
+        {{ t("course.checkout.total") }}:
+        {{ formatMoney(paymentIntent.final_price, paymentIntent.currency) }}
+      </p>
+      <p>Status: {{ checkoutState?.checkout_state }}</p>
+      <p>{{ t("course.checkout.retryHint") }}</p>
+    </div>
+
+    <div
       v-if="
         paymentIntent &&
         checkoutState?.checkout_state !== 'access_granted' &&
-        checkoutState?.checkout_state !== 'conflict_existing_access'
+        checkoutState?.checkout_state !== 'conflict_existing_access' &&
+        checkoutState?.checkout_state !== 'payment_rejected'
       "
       class="checkout-card__success"
     >
@@ -120,3 +135,13 @@ function updateStudent(event: Event) {
   emit("updateStudent", (event.target as HTMLSelectElement).value);
 }
 </script>
+
+<style scoped>
+.checkout-card__rejected {
+  border: 1px solid #7f1d1d;
+  border-radius: 0.5rem;
+  background: #450a0a;
+  color: #fecaca;
+  padding: 0.75rem;
+}
+</style>
