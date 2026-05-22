@@ -26,6 +26,7 @@ export function useCheckoutStateQuery(
         : null
     ),
     {
+      dedupe: "defer",
       immediate: enabled,
       key: computed(() =>
         enabled.value
@@ -33,7 +34,7 @@ export function useCheckoutStateQuery(
           : "GET:/parent/payments/students/__empty__/courses/__empty__/checkout-state"
       ),
       server: false,
-      watch: [resolvedStudentId, resolvedCourseId, overrideEnabled, enabled]
+      watch: [resolvedStudentId, resolvedCourseId, overrideEnabled]
     }
   );
 }
