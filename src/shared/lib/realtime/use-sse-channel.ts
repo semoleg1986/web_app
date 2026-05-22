@@ -6,6 +6,7 @@ export function useSseChannel(
   handlers: {
     // eslint-disable-next-line no-unused-vars
     onMessage?: (message: string) => void | Promise<void>;
+    onOpen?: () => void;
     onError?: () => void;
   } = {}
 ) {
@@ -25,6 +26,9 @@ export function useSseChannel(
     }
 
     source = new EventSource(nextUrl, { withCredentials: true });
+    source.onopen = () => {
+      handlers.onOpen?.();
+    };
     source.addEventListener("update", (event) => {
       handlers.onMessage?.((event as MessageEvent<string>).data);
     });

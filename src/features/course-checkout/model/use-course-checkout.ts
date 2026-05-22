@@ -44,6 +44,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const checkoutPending = ref(false);
   const checkoutError = ref("");
   const sseRefreshQueued = ref(false);
+  const streamFallbackMode = ref(false);
   let refreshPollTimer: ReturnType<typeof setInterval> | null = null;
 
   const canCreateStudent = computed(
@@ -91,7 +92,13 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   });
 
   useSseChannel(streamUrl, {
+    onOpen: () => {
+      streamFallbackMode.value = false;
+      stopRefreshPolling();
+    },
     onError: () => {
+      streamFallbackMode.value = true;
+      startRefreshPolling();
       void refreshCheckoutStateSafely();
     },
     onMessage: () => {
@@ -114,17 +121,36 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   }
 
   if (import.meta.client) {
+    watch(streamUrl, (nextUrl) => {
+      if (nextUrl) {
+        return;
+      }
+      streamFallbackMode.value = false;
+      stopRefreshPolling();
+    });
+
     watch(
       checkoutStateEnabled,
       (enabled) => {
         if (!enabled) {
+          streamFallbackMode.value = false;
           stopRefreshPolling();
-          return;
         }
-        startRefreshPolling();
       },
       { immediate: true }
     );
+
+    watch(streamFallbackMode, (enabled) => {
+      if (!checkoutStateEnabled.value) {
+        stopRefreshPolling();
+        return;
+      }
+      if (enabled) {
+        startRefreshPolling();
+        return;
+      }
+      stopRefreshPolling();
+    });
 
     onBeforeUnmount(() => {
       stopRefreshPolling();
