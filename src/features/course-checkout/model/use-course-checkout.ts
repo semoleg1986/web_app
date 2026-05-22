@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch } from "vue";
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import type { Ref } from "vue";
 import { useCookie } from "#app";
 
@@ -9,6 +9,8 @@ import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
 import { ApiRequestError } from "~/shared/api/types";
 import { useSseChannel } from "~/shared/lib/realtime/use-sse-channel";
+
+const CHECKOUT_REFRESH_POLL_INTERVAL_MS = 5000;
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const paymentsCommands = usePaymentsCommands();
@@ -42,6 +44,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const checkoutPending = ref(false);
   const checkoutError = ref("");
   const sseRefreshQueued = ref(false);
+  let refreshPollTimer: ReturnType<typeof setInterval> | null = null;
 
   const canCreateStudent = computed(
     () =>
@@ -71,6 +74,14 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
   const isSseRefreshBlocked = computed(() => checkoutPending.value || createStudentPending.value);
 
+  async function refreshCheckoutStateSafely() {
+    if (isSseRefreshBlocked.value) {
+      sseRefreshQueued.value = true;
+      return;
+    }
+    await refreshCheckoutState();
+  }
+
   watch(isSseRefreshBlocked, async (blocked) => {
     if (blocked || !sseRefreshQueued.value) {
       return;
@@ -80,14 +91,45 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   });
 
   useSseChannel(streamUrl, {
-    onMessage: async () => {
-      if (isSseRefreshBlocked.value) {
-        sseRefreshQueued.value = true;
-        return;
-      }
-      await refreshCheckoutState();
+    onError: () => {
+      void refreshCheckoutStateSafely();
+    },
+    onMessage: () => {
+      void refreshCheckoutStateSafely();
     }
   });
+
+  function stopRefreshPolling() {
+    if (refreshPollTimer !== null) {
+      clearInterval(refreshPollTimer);
+      refreshPollTimer = null;
+    }
+  }
+
+  function startRefreshPolling() {
+    stopRefreshPolling();
+    refreshPollTimer = setInterval(() => {
+      void refreshCheckoutStateSafely();
+    }, CHECKOUT_REFRESH_POLL_INTERVAL_MS);
+  }
+
+  if (import.meta.client) {
+    watch(
+      checkoutStateEnabled,
+      (enabled) => {
+        if (!enabled) {
+          stopRefreshPolling();
+          return;
+        }
+        startRefreshPolling();
+      },
+      { immediate: true }
+    );
+
+    onBeforeUnmount(() => {
+      stopRefreshPolling();
+    });
+  }
 
   const checkoutState = computed(() => checkoutStateData.value ?? null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
