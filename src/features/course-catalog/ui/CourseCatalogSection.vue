@@ -28,6 +28,7 @@
 import type { CourseCardItem } from "~/features/course-catalog/model/types";
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
 import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
+import { formatMoney } from "~/shared/lib/formatting/format-money";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
@@ -39,11 +40,7 @@ defineProps<{
 const { t } = usePreferences();
 
 const formatPrice = (price: CourseCardItem["offer"]["price"]) =>
-  new Intl.NumberFormat(undefined, {
-    currency: price.currency,
-    maximumFractionDigits: 0,
-    style: "currency"
-  }).format(price.salePrice);
+  formatMoney(price.salePrice, price.currency);
 
 const courseHref = (course: CourseCardItem) =>
   `/courses/${resolveCourseRouteId(course.id, course.courseId)}`;

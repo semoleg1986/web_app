@@ -1,5 +1,6 @@
 import { normalizeCourseLevel, useCourseDetails } from "~/features/course-catalog";
 import { resolveCourseRouteId } from "~/features/course-catalog/model/resolve-course-route-id";
+import { formatMoney } from "~/shared/lib/formatting/format-money";
 import { buildCourseTitle } from "~/shared/lib/seo/build-course-title";
 
 export function useCourseDetailsPage() {
@@ -64,11 +65,7 @@ export function useCourseDetailsPage() {
   }));
 
   function formatPrice(price: (typeof course.value.offers)[number]["price"]) {
-    return new Intl.NumberFormat(undefined, {
-      currency: price.currency,
-      maximumFractionDigits: 0,
-      style: "currency"
-    }).format(price.salePrice);
+    return formatMoney(price.salePrice, price.currency);
   }
 
   return {

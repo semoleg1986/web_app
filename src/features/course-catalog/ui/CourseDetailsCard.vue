@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import { normalizeCourseLevel } from "~/features/course-catalog/model/normalize-level";
 import type { CourseDetailsItem } from "~/features/course-catalog/model/types";
+import { formatMoney } from "~/shared/lib/formatting/format-money";
 import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppCard from "~/shared/ui/app-card/AppCard.vue";
 
@@ -30,11 +31,7 @@ defineProps<{
 const { t } = usePreferences();
 
 const formatPrice = (price: CourseDetailsItem["offers"][number]["price"]) =>
-  new Intl.NumberFormat(undefined, {
-    currency: price.currency,
-    maximumFractionDigits: 0,
-    style: "currency"
-  }).format(price.salePrice);
+  formatMoney(price.salePrice, price.currency);
 </script>
 
 <style scoped>
