@@ -215,8 +215,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     checkoutError.value = "";
 
     try {
+      const idempotencySuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       await paymentsCommands.createPaymentIntent({
-        idempotency_key: `web-offer-${course.value.defaultOffer.offerId}-${selectedStudentId.value}`,
+        idempotency_key:
+          `web-offer-${course.value.defaultOffer.offerId}-${selectedStudentId.value}` +
+          `-${idempotencySuffix}`,
         offer_id: course.value.defaultOffer.offerId,
         parent_id: user.value.user_id,
         student_id: selectedStudentId.value
