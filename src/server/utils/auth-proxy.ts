@@ -16,6 +16,10 @@ interface AuthTokenPairResponse {
   token_type: "Bearer";
 }
 
+interface AuthInviteAcceptResponse extends AuthTokenPairResponse {
+  user: AuthMeResponse;
+}
+
 interface AuthMeResponse {
   account_id: string;
   user_id: string;
@@ -170,6 +174,48 @@ export async function proxyLogin(event: H3Event) {
   }
 
   return meResponse;
+}
+
+export async function proxyAcceptInvite(event: H3Event) {
+  const body = await readBody(event);
+  const headers = new Headers({ "Content-Type": "application/json" });
+  const userAgent = getHeader(event, "user-agent");
+
+  forwardTracingHeaders(event, headers);
+
+  const payload =
+    typeof body === "object" && body !== null
+      ? {
+          ...body,
+          user_agent_raw:
+            typeof (body as Record<string, unknown>).user_agent_raw === "string"
+              ? (body as Record<string, string>).user_agent_raw
+              : (userAgent ?? undefined)
+        }
+      : body;
+
+  const response = await fetch(`${authServiceBaseUrl()}/v1/auth/invites/accept`, {
+    body: JSON.stringify(payload),
+    headers,
+    method: "POST"
+  });
+
+  if (!response.ok) {
+    return await forwardUpstreamError(event, response);
+  }
+
+  const accepted = (await response.json()) as AuthInviteAcceptResponse;
+  setAuthCookies(event, {
+    accessToken: accepted.access_token,
+    expiresIn: accepted.expires_in,
+    refreshToken: accepted.refresh_token
+  });
+
+  return {
+    expires_in: accepted.expires_in,
+    token_type: accepted.token_type,
+    user: accepted.user
+  };
 }
 
 export async function proxyMe(event: H3Event): Promise<AuthMeResponse | Record<string, unknown>> {

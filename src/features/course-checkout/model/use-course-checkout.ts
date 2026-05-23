@@ -41,6 +41,9 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     email: "",
     phone: ""
   });
+  const createInvitePending = ref(false);
+  const createInviteError = ref("");
+  const inviteUrl = ref("");
   const checkoutPending = ref(false);
   const checkoutError = ref("");
   const sseRefreshQueued = ref(false);
@@ -232,6 +235,40 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     }
   }
 
+  async function createInvite() {
+    if (!selectedStudentId.value) {
+      return;
+    }
+
+    createInvitePending.value = true;
+    createInviteError.value = "";
+    inviteUrl.value = "";
+
+    try {
+      const idempotencySuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      const invite = await parentStudentsCommands.createStudentInvite(selectedStudentId.value, {
+        delivery_channel: "link",
+        idempotency_key: `web-student-invite-${selectedStudentId.value}-${idempotencySuffix}`,
+        ttl_seconds: 86400
+      });
+      const rawToken = invite.invite_token;
+      if (!rawToken) {
+        throw new Error("Invite token was not returned");
+      }
+      const runtimeConfig = useRuntimeConfig();
+      const origin =
+        import.meta.client && window.location.origin
+          ? window.location.origin
+          : String(runtimeConfig.public.siteUrl || "http://localhost:3000").replace(/\/$/, "");
+      inviteUrl.value = `${origin}/auth/invites/accept?token=${encodeURIComponent(rawToken)}`;
+    } catch (error) {
+      createInviteError.value =
+        error instanceof ApiRequestError ? error.message : "Failed to create invite";
+    } finally {
+      createInvitePending.value = false;
+    }
+  }
+
   async function createIntent() {
     if (!user.value || !course.value.defaultOffer || !selectedStudentId.value) {
       return;
@@ -269,6 +306,9 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     checkoutError,
     checkoutPending,
     checkoutState,
+    createInvite,
+    createInviteError,
+    createInvitePending,
     createIntent,
     createStudent,
     createStudentError,
@@ -277,6 +317,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     createStudentSuccess,
     isAuthenticated,
     isParent,
+    inviteUrl,
     nextAction,
     paymentIntent,
     purchasedOffer,

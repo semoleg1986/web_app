@@ -22,7 +22,10 @@
         v-if="students.length > 0"
         :access-grant="accessGrant"
         :checkout-state="checkoutState"
+        :create-invite-error="createInviteError"
+        :create-invite-pending="createInvitePending"
         :error-message="checkoutError"
+        :invite-url="inviteUrl"
         :next-action="nextAction"
         :payment-intent="paymentIntent"
         :pending="checkoutPending"
@@ -32,6 +35,7 @@
         :show-create-student-form="showCreateStudentForm"
         :students="students"
         @open-create-child="showCreateStudentForm = true"
+        @create-invite="createInvite"
         @submit="createIntent"
         @update-student="selectedStudentId = $event"
       />
@@ -61,6 +65,9 @@ const {
   checkoutError,
   checkoutPending,
   checkoutState,
+  createInvite,
+  createInviteError,
+  createInvitePending,
   createIntent,
   createStudent,
   createStudentError,
@@ -69,6 +76,7 @@ const {
   createStudentSuccess,
   isAuthenticated,
   isParent,
+  inviteUrl,
   nextAction,
   paymentIntent,
   purchasedOffer,

@@ -7,6 +7,12 @@ export interface AuthLoginPayload {
   session_fingerprint?: string;
 }
 
+export interface AuthAcceptInvitePayload {
+  password: string;
+  session_fingerprint?: string;
+  token: string;
+}
+
 export interface AuthRegisterPayload {
   email: string;
   password: string;

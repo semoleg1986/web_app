@@ -17,6 +17,27 @@
       </select>
     </AppFormField>
 
+    <div class="checkout-card__invite">
+      <AppButton
+        :disabled="createInvitePending || !selectedStudentId"
+        variant="ghost"
+        size="sm"
+        @click="$emit('createInvite')"
+      >
+        {{
+          createInvitePending
+            ? t("course.checkout.invitePending")
+            : t("course.checkout.inviteChild")
+        }}
+      </AppButton>
+      <p v-if="createInviteError" class="checkout-card__error">{{ createInviteError }}</p>
+      <div v-if="inviteUrl" class="checkout-card__invite-link">
+        <strong>{{ t("course.checkout.inviteReady") }}</strong>
+        <input :value="inviteUrl" readonly @focus="selectInput" />
+        <p>{{ t("course.checkout.inviteHint") }}</p>
+      </div>
+    </div>
+
     <AppButton
       :disabled="
         pending ||
@@ -112,7 +133,10 @@ import AppFormField from "~/shared/ui/app-form-field/AppFormField.vue";
 defineProps<{
   accessGrant: CourseAccessGrantSnapshot | null;
   checkoutState: CheckoutStateSnapshot | null;
+  createInviteError: string;
+  createInvitePending: boolean;
   errorMessage: string;
+  inviteUrl: string;
   nextAction: string;
   paymentIntent: PaymentIntentSnapshot | null;
   pending: boolean;
@@ -124,6 +148,7 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
+  createInvite: [];
   openCreateChild: [];
   submit: [];
   updateStudent: [studentId: string];
@@ -134,9 +159,49 @@ const { t } = usePreferences();
 function updateStudent(event: Event) {
   emit("updateStudent", (event.target as HTMLSelectElement).value);
 }
+
+function selectInput(event: Event) {
+  (event.target as HTMLInputElement).select();
+}
 </script>
 
 <style scoped>
+.checkout-card__invite {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.checkout-card__invite-link {
+  display: grid;
+  gap: 0.45rem;
+  border: 1px solid var(--c-border);
+  border-radius: 0.8rem;
+  background: color-mix(in srgb, var(--c-surface) 88%, var(--c-accent));
+  padding: 0.75rem;
+}
+
+.checkout-card__invite-link input {
+  width: 100%;
+  border: 1px solid var(--c-border);
+  border-radius: 0.65rem;
+  background: var(--c-bg);
+  color: var(--c-fg);
+  padding: 0.65rem;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.checkout-card__invite-link p {
+  margin: 0;
+  color: var(--c-muted);
+  font-size: 0.82rem;
+}
+
+.checkout-card__error {
+  margin: 0;
+  color: #ef4444;
+}
+
 .checkout-card__rejected {
   border: 1px solid #7f1d1d;
   border-radius: 0.5rem;
