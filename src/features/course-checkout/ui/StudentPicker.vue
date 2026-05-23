@@ -33,7 +33,12 @@
       <p v-if="createInviteError" class="checkout-card__error">{{ createInviteError }}</p>
       <div v-if="inviteUrl" class="checkout-card__invite-link">
         <strong>{{ t("course.checkout.inviteReady") }}</strong>
-        <input :value="inviteUrl" readonly @focus="selectInput" />
+        <div class="checkout-card__invite-copy">
+          <input :value="inviteUrl" readonly @focus="selectInput" />
+          <AppButton size="sm" variant="ghost" @click="copyInviteUrl">
+            {{ inviteCopied ? t("course.checkout.inviteCopied") : t("course.checkout.inviteCopy") }}
+          </AppButton>
+        </div>
         <p>{{ t("course.checkout.inviteHint") }}</p>
       </div>
     </div>
@@ -118,6 +123,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
 import type { ParentStudentItem } from "~/features/parent-students";
 import type {
   CheckoutOfferSnapshot,
@@ -130,7 +137,7 @@ import { usePreferences } from "~/shared/lib/preferences/use-preferences";
 import AppButton from "~/shared/ui/app-button/AppButton.vue";
 import AppFormField from "~/shared/ui/app-form-field/AppFormField.vue";
 
-defineProps<{
+const props = defineProps<{
   accessGrant: CourseAccessGrantSnapshot | null;
   checkoutState: CheckoutStateSnapshot | null;
   createInviteError: string;
@@ -155,6 +162,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = usePreferences();
+const inviteCopied = ref(false);
 
 function updateStudent(event: Event) {
   emit("updateStudent", (event.target as HTMLSelectElement).value);
@@ -162,6 +170,29 @@ function updateStudent(event: Event) {
 
 function selectInput(event: Event) {
   (event.target as HTMLInputElement).select();
+}
+
+async function copyInviteUrl() {
+  inviteCopied.value = false;
+
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(props.inviteUrl);
+  } else {
+    const textarea = document.createElement("textarea");
+    textarea.value = props.inviteUrl;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
+  }
+
+  inviteCopied.value = true;
+  window.setTimeout(() => {
+    inviteCopied.value = false;
+  }, 1800);
 }
 </script>
 
@@ -182,6 +213,7 @@ function selectInput(event: Event) {
 
 .checkout-card__invite-link input {
   width: 100%;
+  min-width: 0;
   border: 1px solid var(--c-border);
   border-radius: 0.65rem;
   background: var(--c-bg);
@@ -191,10 +223,22 @@ function selectInput(event: Event) {
   font-size: 0.82rem;
 }
 
+.checkout-card__invite-copy {
+  display: grid;
+  gap: 0.45rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .checkout-card__invite-link p {
   margin: 0;
   color: var(--c-muted);
   font-size: 0.82rem;
+}
+
+@media (max-width: 520px) {
+  .checkout-card__invite-copy {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .checkout-card__error {

@@ -50,6 +50,8 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.inviteChild": "Пригласить ребенка",
     "course.checkout.invitePending": "Создаем приглашение...",
     "course.checkout.inviteReady": "Invite link готов",
+    "course.checkout.inviteCopy": "Скопировать",
+    "course.checkout.inviteCopied": "Скопировано",
     "course.checkout.inviteHint":
       "Передайте ссылку ребенку. После установки пароля он войдет как student.",
     "nav.home": "Главная",
@@ -134,6 +136,8 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.inviteChild": "Invite child",
     "course.checkout.invitePending": "Creating invite...",
     "course.checkout.inviteReady": "Invite link is ready",
+    "course.checkout.inviteCopy": "Copy",
+    "course.checkout.inviteCopied": "Copied",
     "course.checkout.inviteHint":
       "Share this link with the child. After setting a password, they will sign in as a student.",
     "nav.home": "Home",
