@@ -36,14 +36,31 @@
       </div>
     </div>
 
-    <div v-if="authPanelOpen && !user" class="header__panel">
-      <AuthPanel :mode-value="authPanelMode" @close="closePanel" />
+    <div
+      v-if="authPanelOpen && !user"
+      class="auth-modal"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="t('auth.panel.label')"
+      @click.self="closePanel"
+    >
+      <div class="auth-modal__content" @click.stop>
+        <button
+          type="button"
+          class="auth-modal__close"
+          :aria-label="t('auth.modal.close')"
+          @click="closePanel"
+        >
+          ×
+        </button>
+        <AuthPanel :mode-value="authPanelMode" @close="closePanel" />
+      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { onBeforeUnmount, onMounted, watch } from "vue";
 
 import { useAuthPanel, useAuthSession } from "~/features/auth";
 import AuthPanel from "~/features/auth/ui/AuthPanel.vue";
@@ -69,6 +86,20 @@ watch(user, (nextUser) => {
   if (nextUser) {
     closePanel();
   }
+});
+
+function handleEscape(event: KeyboardEvent) {
+  if (event.key === "Escape" && authPanelOpen.value) {
+    closePanel();
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", handleEscape);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleEscape);
 });
 </script>
 
@@ -150,12 +181,35 @@ watch(user, (nextUser) => {
   font-size: 0.76rem;
 }
 
-.header__panel {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 1rem 1rem;
-  display: flex;
-  justify-content: flex-end;
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--c-bg) 30%, #02070a 70%);
+  backdrop-filter: blur(8px);
+}
+
+.auth-modal__content {
+  width: min(100%, 25rem);
+  position: relative;
+}
+
+.auth-modal__close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-fg);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
 }
 
 @media (max-width: 720px) {
@@ -170,8 +224,7 @@ watch(user, (nextUser) => {
     padding-bottom: 0.8rem;
   }
 
-  .header__actions,
-  .header__panel {
+  .header__actions {
     width: 100%;
   }
 
@@ -185,6 +238,11 @@ watch(user, (nextUser) => {
 @media (max-width: 767px) {
   .header {
     position: relative;
+  }
+
+  .auth-modal {
+    align-items: end;
+    padding: 0.75rem;
   }
 }
 </style>
