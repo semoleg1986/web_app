@@ -76,4 +76,15 @@ withDefaults(
 .shell-section--hidden .shell-section__body {
   overflow: hidden;
 }
+
+@media (max-width: 767px) {
+  .shell-section {
+    overflow: visible;
+  }
+
+  .shell-section--auto .shell-section__body,
+  .shell-section--hidden .shell-section__body {
+    overflow: visible;
+  }
+}
 </style>

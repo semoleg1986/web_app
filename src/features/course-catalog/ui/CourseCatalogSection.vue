@@ -88,4 +88,14 @@ p {
   margin-top: 0.4rem;
   display: inline-block;
 }
+
+@media (max-width: 767px) {
+  .catalog {
+    height: auto;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 </style>

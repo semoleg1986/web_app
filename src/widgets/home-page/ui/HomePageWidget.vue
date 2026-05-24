@@ -94,7 +94,9 @@ useHead(() => ({
 
 @media (max-width: 767px) {
   .dashboard {
-    padding: 0.75rem 0.75rem 0;
+    height: auto;
+    min-height: 100%;
+    padding: 0.75rem 0.75rem calc(5.5rem + env(safe-area-inset-bottom));
     gap: 0.75rem;
   }
 }

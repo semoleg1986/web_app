@@ -50,11 +50,20 @@ textarea {
 }
 
 @media (max-width: 767px) {
+  html,
+  body,
+  #__nuxt {
+    min-height: 100%;
+    height: auto;
+  }
+
   body {
     background: linear-gradient(
       180deg,
       color-mix(in srgb, var(--c-bg) 92%, #d9f1ee) 0%,
       var(--c-bg) 38%
     );
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }

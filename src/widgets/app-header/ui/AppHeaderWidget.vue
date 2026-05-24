@@ -184,7 +184,7 @@ onBeforeUnmount(() => {
 .auth-modal {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 60;
   display: grid;
   place-items: center;
   padding: 1rem;

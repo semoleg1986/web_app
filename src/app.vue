@@ -33,4 +33,16 @@ useWebAppBootstrap();
   flex: 1;
   overflow: hidden;
 }
+
+@media (max-width: 767px) {
+  .app-shell {
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
+  }
+
+  .app-shell__content {
+    overflow: visible;
+  }
+}
 </style>

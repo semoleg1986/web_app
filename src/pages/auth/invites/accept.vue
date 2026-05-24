@@ -142,8 +142,10 @@ async function submit() {
 
 @media (max-width: 767px) {
   .invite-page {
+    height: auto;
+    min-height: 100%;
     align-items: start;
-    padding: 0.75rem;
+    padding: 0.75rem 0.75rem calc(5.5rem + env(safe-area-inset-bottom));
   }
 }
 </style>
