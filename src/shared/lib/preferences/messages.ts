@@ -24,6 +24,10 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.title": "Покупка доступа",
     "course.checkout.loginRequired": "Войдите как родитель, чтобы оформить доступ.",
     "course.checkout.parentOnly": "Покупка доступна только для роли parent.",
+    "course.checkout.studentTitle": "Доступ к курсу",
+    "course.checkout.studentNoticeTitle": "Покупку оформляет родитель",
+    "course.checkout.studentNoticeBody":
+      "Попросите родителя открыть этот курс в своем аккаунте и купить доступ для вас.",
     "course.checkout.noOffer": "Для этого курса пока нет доступного offer.",
     "course.checkout.noStudents": "У родителя пока нет связанных учеников.",
     "course.checkout.addChild": "Добавить ребенка",
@@ -111,6 +115,10 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.title": "Buy access",
     "course.checkout.loginRequired": "Sign in as a parent to buy access.",
     "course.checkout.parentOnly": "Checkout is available only for the parent role.",
+    "course.checkout.studentTitle": "Course access",
+    "course.checkout.studentNoticeTitle": "A parent buys access",
+    "course.checkout.studentNoticeBody":
+      "Ask your parent to open this course in their account and buy access for you.",
     "course.checkout.noOffer": "No offer is currently available for this course.",
     "course.checkout.noStudents": "This parent has no linked students yet.",
     "course.checkout.addChild": "Add child",

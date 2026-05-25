@@ -18,6 +18,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const { initialized, isAuthenticated, user } = useAuthSession();
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
+  const isStudent = computed(() => Boolean(user.value?.roles.includes("student")));
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
   const currentParentUserId = computed(() => user.value?.user_id ?? "");
   const {
@@ -317,6 +318,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     createStudentSuccess,
     isAuthenticated,
     isParent,
+    isStudent,
     inviteUrl,
     nextAction,
     paymentIntent,

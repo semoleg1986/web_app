@@ -1,8 +1,12 @@
 <template>
   <AppCard class="checkout-card">
-    <h2>{{ t("course.checkout.title") }}</h2>
+    <h2>{{ isStudent ? t("course.checkout.studentTitle") : t("course.checkout.title") }}</h2>
 
     <p v-if="!isAuthenticated">{{ t("course.checkout.loginRequired") }}</p>
+    <div v-else-if="isStudent" class="checkout-card__notice">
+      <strong>{{ t("course.checkout.studentNoticeTitle") }}</strong>
+      <p>{{ t("course.checkout.studentNoticeBody") }}</p>
+    </div>
     <p v-else-if="!isParent">{{ t("course.checkout.parentOnly") }}</p>
     <p v-else-if="!course.defaultOffer">{{ t("course.checkout.noOffer") }}</p>
     <div v-else class="checkout-card__stack">
@@ -76,6 +80,7 @@ const {
   createStudentSuccess,
   isAuthenticated,
   isParent,
+  isStudent,
   inviteUrl,
   nextAction,
   paymentIntent,
@@ -96,5 +101,23 @@ const {
 .checkout-card__stack {
   display: grid;
   gap: 1rem;
+}
+
+.checkout-card__notice {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--c-accent) 22%, var(--c-border));
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--c-accent) 8%, var(--c-surface));
+}
+
+.checkout-card__notice strong,
+.checkout-card__notice p {
+  margin: 0;
+}
+
+.checkout-card__notice p {
+  color: var(--c-muted);
 }
 </style>
