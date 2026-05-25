@@ -9,6 +9,20 @@ export default defineNuxtConfig({
   nitro: {
     preset: "node-server"
   },
+  routeRules: {
+    "/_nuxt/**": {
+      headers: {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    "/**": {
+      headers: {
+        "Cache-Control": "private, no-cache, no-store, no-transform, must-revalidate, max-age=0",
+        Expires: "0",
+        Pragma: "no-cache"
+      }
+    }
+  },
   runtimeConfig: {
     authServiceBaseUrl: "http://localhost:8000",
     bonusServiceBaseUrl: "http://localhost:8006",
