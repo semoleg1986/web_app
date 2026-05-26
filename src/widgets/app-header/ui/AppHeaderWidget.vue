@@ -105,15 +105,18 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .header {
+  --auth-modal-top: 4.5rem;
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 70;
   backdrop-filter: blur(12px);
   background: color-mix(in srgb, var(--c-bg) 86%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--c-border) 84%, transparent);
 }
 
 .header__main {
+  position: relative;
+  z-index: 80;
   max-width: 1080px;
   margin: 0 auto;
   padding: 1rem;
@@ -183,17 +186,19 @@ onBeforeUnmount(() => {
 
 .auth-modal {
   position: fixed;
-  inset: 0;
+  inset: var(--auth-modal-top) 0 0;
   z-index: 60;
   display: grid;
-  place-items: center;
+  place-items: start center;
   padding: 1rem;
   background: color-mix(in srgb, var(--c-bg) 30%, #02070a 70%);
   backdrop-filter: blur(8px);
+  overflow-y: auto;
 }
 
 .auth-modal__content {
   width: min(100%, 25rem);
+  max-height: calc(100dvh - var(--auth-modal-top) - 2rem);
   position: relative;
 }
 
@@ -213,6 +218,10 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
+  .header {
+    --auth-modal-top: 8.25rem;
+  }
+
   .header__main,
   .header__guest,
   .header__session {
@@ -243,6 +252,11 @@ onBeforeUnmount(() => {
   .auth-modal {
     align-items: end;
     padding: 0.75rem;
+  }
+
+  .auth-modal__content {
+    max-height: calc(100dvh - var(--auth-modal-top) - 1.5rem);
+    overflow-y: auto;
   }
 }
 </style>
