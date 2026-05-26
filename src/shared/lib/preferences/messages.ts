@@ -25,6 +25,11 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.loginRequired": "Войдите как родитель, чтобы оформить доступ.",
     "course.checkout.parentOnly": "Покупка доступна только для роли parent.",
     "course.checkout.studentTitle": "Доступ к курсу",
+    "course.checkout.studentAccessGrantedTitle": "Доступ активен",
+    "course.checkout.studentAccessGrantedBody":
+      "Родитель уже оформил этот курс для вас. Можно переходить к обучению.",
+    "course.checkout.studentAccessPendingTitle": "Проверяем доступ",
+    "course.checkout.studentAccessPendingBody": "Сверяем статус покупки и доступ к курсу.",
     "course.checkout.studentNoticeTitle": "Покупку оформляет родитель",
     "course.checkout.studentNoticeBody":
       "Попросите родителя открыть этот курс в своем аккаунте и купить доступ для вас.",
@@ -116,6 +121,11 @@ export const MESSAGES: Record<LocaleCode, Record<string, string>> = {
     "course.checkout.loginRequired": "Sign in as a parent to buy access.",
     "course.checkout.parentOnly": "Checkout is available only for the parent role.",
     "course.checkout.studentTitle": "Course access",
+    "course.checkout.studentAccessGrantedTitle": "Access is active",
+    "course.checkout.studentAccessGrantedBody":
+      "Your parent has already bought this course for you. You can continue learning.",
+    "course.checkout.studentAccessPendingTitle": "Checking access",
+    "course.checkout.studentAccessPendingBody": "Checking purchase status and course access.",
     "course.checkout.studentNoticeTitle": "A parent buys access",
     "course.checkout.studentNoticeBody":
       "Ask your parent to open this course in their account and buy access for you.",

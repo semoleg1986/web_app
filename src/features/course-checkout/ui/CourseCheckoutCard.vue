@@ -3,6 +3,17 @@
     <h2>{{ isStudent ? t("course.checkout.studentTitle") : t("course.checkout.title") }}</h2>
 
     <p v-if="!isAuthenticated">{{ t("course.checkout.loginRequired") }}</p>
+    <div
+      v-else-if="isStudent && studentHasCourseAccess"
+      class="checkout-card__notice checkout-card__notice--success"
+    >
+      <strong>{{ t("course.checkout.studentAccessGrantedTitle") }}</strong>
+      <p>{{ t("course.checkout.studentAccessGrantedBody") }}</p>
+    </div>
+    <div v-else-if="isStudentCourseAccessPending" class="checkout-card__notice">
+      <strong>{{ t("course.checkout.studentAccessPendingTitle") }}</strong>
+      <p>{{ t("course.checkout.studentAccessPendingBody") }}</p>
+    </div>
     <div v-else-if="isStudent" class="checkout-card__notice">
       <strong>{{ t("course.checkout.studentNoticeTitle") }}</strong>
       <p>{{ t("course.checkout.studentNoticeBody") }}</p>
@@ -88,6 +99,8 @@ const {
   selectedStudentId,
   selectedOffer,
   showCreateStudentForm,
+  studentCourseAccessPending: isStudentCourseAccessPending,
+  studentHasCourseAccess,
   students,
   updateCreateStudentField
 } = useCourseCheckout(course);
@@ -110,6 +123,11 @@ const {
   border: 1px solid color-mix(in srgb, var(--c-accent) 22%, var(--c-border));
   border-radius: 1rem;
   background: color-mix(in srgb, var(--c-accent) 8%, var(--c-surface));
+}
+
+.checkout-card__notice--success {
+  border-color: color-mix(in srgb, #2f9e44 34%, var(--c-border));
+  background: color-mix(in srgb, #2f9e44 12%, var(--c-surface));
 }
 
 .checkout-card__notice strong,

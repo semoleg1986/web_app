@@ -3,6 +3,7 @@ import type { Ref } from "vue";
 import { useCookie } from "#app";
 
 import { useAuthSession } from "~/features/auth";
+import { useStudentCourseAccessQuery } from "~/features/course-access";
 import type { CourseDetailsItem } from "~/features/course-catalog";
 import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
@@ -19,7 +20,15 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
 
   const isParent = computed(() => Boolean(user.value?.roles.includes("parent")));
   const isStudent = computed(() => Boolean(user.value?.roles.includes("student")));
+  const courseKey = computed(() => course.value.courseId);
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
+  const studentAccessEnabled = computed(
+    () =>
+      initialized.value &&
+      isAuthenticated.value &&
+      isStudent.value &&
+      courseKey.value.trim().length > 0
+  );
   const currentParentUserId = computed(() => user.value?.user_id ?? "");
   const {
     data: studentsData,
@@ -31,7 +40,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   });
 
   const students = computed<ParentStudentItem[]>(() => studentsData.value?.items ?? []);
-  const courseKey = computed(() => course.value.courseId);
   const selectedStudentId = ref("");
   const showCreateStudentForm = ref(false);
   const createStudentPending = ref(false);
@@ -70,6 +78,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     courseKey,
     checkoutStateEnabled
   );
+  const {
+    data: studentCourseAccessData,
+    pending: studentCourseAccessPending,
+    refresh: refreshStudentCourseAccess
+  } = useStudentCourseAccessQuery(courseKey, studentAccessEnabled);
 
   const streamUrl = computed(() =>
     checkoutStateEnabled.value
@@ -162,6 +175,12 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   }
 
   const checkoutState = computed(() => checkoutStateData.value ?? null);
+  const studentCourseAccess = computed(() => studentCourseAccessData.value ?? null);
+  const studentHasCourseAccess = computed(
+    () =>
+      studentCourseAccess.value?.decision === "allow" &&
+      studentCourseAccess.value.grant_status === "approved"
+  );
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
   const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
   const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
@@ -323,9 +342,13 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     nextAction,
     paymentIntent,
     purchasedOffer,
+    refreshStudentCourseAccess,
     selectedStudentId,
     selectedOffer,
     showCreateStudentForm,
+    studentCourseAccess,
+    studentCourseAccessPending,
+    studentHasCourseAccess,
     students,
     updateCreateStudentField,
     user

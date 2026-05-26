@@ -1,6 +1,6 @@
 # web_app
 
-Parent-facing Nuxt storefront.
+Parent/student-facing Nuxt storefront.
 
 ## Responsibility
 
@@ -9,6 +9,7 @@ Parent-facing Nuxt storefront.
 - public catalog browsing
 - parent auth session UX
 - child creation during checkout
+- student course access status after invite/onboarding
 - payment intent creation for selected student and offer
 - server-side backend proxies under `/api`
 
