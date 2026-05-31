@@ -9,7 +9,7 @@
     >
       <strong>{{ t("course.checkout.studentAccessGrantedTitle") }}</strong>
       <p>{{ t("course.checkout.studentAccessGrantedBody") }}</p>
-      <div v-if="studentCourseProgress" class="checkout-card__progress">
+      <div v-if="studentCourseLearning" class="checkout-card__progress">
         <div class="checkout-card__progress-row">
           <span>{{ t("course.learning.progress") }}</span>
           <strong>{{ progressPercent }}%</strong>
@@ -20,21 +20,26 @@
         <p>
           {{
             t("course.learning.completedLessons")
-              .replace("{completed}", String(studentCourseProgress.completed_lessons))
-              .replace("{total}", String(studentCourseProgress.total_lessons))
+              .replace("{completed}", String(studentCourseLearning.progress.completed_lessons))
+              .replace("{total}", String(studentCourseLearning.progress.total_lessons))
           }}
         </p>
       </div>
       <div v-if="courseModules.length > 0" class="checkout-card__modules">
         <strong>{{ t("course.learning.modules") }}</strong>
         <ul>
-          <li v-for="module in courseModules" :key="module.moduleId">
-            <span>{{ module.title }}</span>
+          <li v-for="module in courseModules" :key="module.module_id">
+            <div>
+              <span>{{ module.title }}</span>
+              <small v-if="module.lessons.length > 0" class="checkout-card__lesson-list">
+                {{ module.lessons.map((lesson) => lesson.title).join(", ") }}
+              </small>
+            </div>
             <small>
               {{
                 t("course.learning.moduleLessons").replace(
                   "{count}",
-                  String(module.lessonsCount)
+                  String(module.lessons_count)
                 )
               }}
             </small>
@@ -44,11 +49,11 @@
       <button
         class="checkout-card__action"
         type="button"
-        :disabled="studentCourseProgressPending"
-        @click="refreshStudentCourseProgress"
+        :disabled="studentCourseLearningPending"
+        @click="refreshStudentCourseLearning"
       >
         {{
-          studentCourseProgressPending
+          studentCourseLearningPending
             ? t("course.learning.refreshing")
             : t("course.learning.continue")
         }}
@@ -140,23 +145,23 @@ const {
   nextAction,
   paymentIntent,
   purchasedOffer,
-  refreshStudentCourseProgress,
+  refreshStudentCourseLearning,
   selectedStudentId,
   selectedOffer,
   showCreateStudentForm,
-  studentCourseAccessPending: isStudentCourseAccessPending,
+  studentCourseLearningPending: isStudentCourseAccessPending,
   studentHasCourseAccess,
   students,
-  studentCourseProgress,
-  studentCourseProgressPending,
+  studentCourseLearning,
+  studentCourseLearningPending,
   updateCreateStudentField
 } = useCourseCheckout(course);
 
 const progressPercent = computed(() => {
-  const rawPercent = studentCourseProgress.value?.progress_percent ?? 0;
+  const rawPercent = studentCourseLearning.value?.progress.progress_percent ?? 0;
   return Math.min(100, Math.max(0, Math.round(rawPercent)));
 });
-const courseModules = computed(() => course.value.modules ?? []);
+const courseModules = computed(() => studentCourseLearning.value?.modules ?? []);
 </script>
 
 <style scoped>
@@ -246,9 +251,22 @@ const courseModules = computed(() => course.value.modules ?? []);
   background: color-mix(in srgb, var(--c-surface) 72%, transparent);
 }
 
+.checkout-card__modules li > div {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
 .checkout-card__modules small {
   color: var(--c-muted);
   white-space: nowrap;
+}
+
+.checkout-card__lesson-list {
+  display: block;
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
 }
 
 .checkout-card__action {

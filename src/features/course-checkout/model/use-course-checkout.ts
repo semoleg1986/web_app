@@ -3,9 +3,8 @@ import type { Ref } from "vue";
 import { useCookie } from "#app";
 
 import { useAuthSession } from "~/features/auth";
-import { useStudentCourseAccessQuery } from "~/features/course-access";
 import type { CourseDetailsItem } from "~/features/course-catalog";
-import { useStudentCourseProgressQuery } from "~/features/course-learning";
+import { useStudentCourseLearningQuery } from "~/features/course-learning";
 import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
@@ -24,7 +23,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const isStudent = computed(() => Boolean(user.value?.roles.includes("student")));
   const courseKey = computed(() => course.value.courseId);
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
-  const studentAccessEnabled = computed(
+  const studentLearningEnabled = computed(
     () =>
       initialized.value &&
       isAuthenticated.value &&
@@ -82,10 +81,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     checkoutStateEnabled
   );
   const {
-    data: studentCourseAccessData,
-    pending: studentCourseAccessPending,
-    refresh: refreshStudentCourseAccess
-  } = useStudentCourseAccessQuery(courseKey, studentAccessEnabled);
+    apiError: studentCourseLearningError,
+    data: studentCourseLearningData,
+    pending: studentCourseLearningPending,
+    refresh: refreshStudentCourseLearning
+  } = useStudentCourseLearningQuery(courseKey, studentLearningEnabled);
 
   const streamUrl = computed(() =>
     checkoutStateEnabled.value
@@ -94,21 +94,11 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   );
 
   const checkoutState = computed(() => checkoutStateData.value ?? null);
-  const studentCourseAccess = computed(() => studentCourseAccessData.value ?? null);
-  const studentHasCourseAccess = computed(
-    () =>
-      studentCourseAccess.value?.decision === "allow" &&
-      studentCourseAccess.value.grant_status === "approved"
+  const studentCourseLearning = computed(() => studentCourseLearningData.value ?? null);
+  const studentLearningDenied = computed(
+    () => studentCourseLearningError.value?.statusCode === 403
   );
-  const studentCourseProgressEnabled = computed(
-    () => studentAccessEnabled.value && studentHasCourseAccess.value
-  );
-  const {
-    data: studentCourseProgressData,
-    pending: studentCourseProgressPending,
-    refresh: refreshStudentCourseProgress
-  } = useStudentCourseProgressQuery(courseKey, studentCourseProgressEnabled);
-  const studentCourseProgress = computed(() => studentCourseProgressData.value ?? null);
+  const studentHasCourseAccess = computed(() => studentCourseLearning.value !== null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
   const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
   const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
@@ -177,7 +167,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     }
 
     studentAccessPollTimer = setInterval(() => {
-      void refreshStudentCourseAccess();
+      void refreshStudentCourseLearning();
     }, STUDENT_ACCESS_POLL_INTERVAL_MS);
   }
 
@@ -214,14 +204,14 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     });
 
     watch(
-      [studentAccessEnabled, studentCourseAccess, studentHasCourseAccess],
-      ([enabled, access, hasAccess]) => {
+      [studentLearningEnabled, studentLearningDenied, studentHasCourseAccess],
+      ([enabled, denied, hasAccess]) => {
         if (!enabled || hasAccess) {
           stopStudentAccessPolling();
           return;
         }
 
-        if (access?.decision === "deny") {
+        if (denied) {
           startStudentAccessPolling();
           return;
         }
@@ -230,13 +220,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       },
       { immediate: true }
     );
-
-    watch(studentHasCourseAccess, (hasAccess) => {
-      if (!hasAccess) {
-        return;
-      }
-      void refreshStudentCourseProgress();
-    });
 
     onBeforeUnmount(() => {
       stopRefreshPolling();
@@ -397,15 +380,12 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     nextAction,
     paymentIntent,
     purchasedOffer,
-    refreshStudentCourseAccess,
-    refreshStudentCourseProgress,
+    refreshStudentCourseLearning,
     selectedStudentId,
     selectedOffer,
     showCreateStudentForm,
-    studentCourseAccess,
-    studentCourseAccessPending,
-    studentCourseProgress,
-    studentCourseProgressPending,
+    studentCourseLearning,
+    studentCourseLearningPending,
     studentHasCourseAccess,
     students,
     updateCreateStudentField,

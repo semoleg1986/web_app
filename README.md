@@ -10,6 +10,7 @@ Parent/student-facing Nuxt storefront.
 - parent auth session UX
 - child creation during checkout
 - student course access status after invite/onboarding
+- student course learning status from `course_service` learning read model
 - payment intent creation for selected student and offer
 - server-side backend proxies under `/api`
 

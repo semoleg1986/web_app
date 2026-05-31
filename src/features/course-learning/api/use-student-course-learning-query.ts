@@ -2,9 +2,9 @@ import { computed, toValue } from "vue";
 import type { MaybeRefOrGetter } from "vue";
 
 import { useApiQuery } from "~/shared/api/use-api-query";
-import type { StudentCourseProgressSnapshot } from "~/features/course-learning/model/types";
+import type { StudentCourseLearningSnapshot } from "~/features/course-learning/model/types";
 
-export function useStudentCourseProgressQuery(
+export function useStudentCourseLearningQuery(
   courseId: MaybeRefOrGetter<string | null | undefined>,
   enabledOverride: MaybeRefOrGetter<boolean> = true
 ) {
@@ -12,17 +12,17 @@ export function useStudentCourseProgressQuery(
   const overrideEnabled = computed(() => Boolean(toValue(enabledOverride)));
   const enabled = computed(() => overrideEnabled.value && resolvedCourseId.value.length > 0);
 
-  return useApiQuery<StudentCourseProgressSnapshot>(
+  return useApiQuery<StudentCourseLearningSnapshot>(
     computed(() =>
-      enabled.value ? `/student/courses/${resolvedCourseId.value}/progress` : null
+      enabled.value ? `/student/courses/${resolvedCourseId.value}/learning` : null
     ),
     {
       dedupe: "defer",
       immediate: enabled,
       key: computed(() =>
         enabled.value
-          ? `GET:/student/courses/${resolvedCourseId.value}/progress`
-          : "GET:/student/courses/__empty__/progress"
+          ? `GET:/student/courses/${resolvedCourseId.value}/learning`
+          : "GET:/student/courses/__empty__/learning"
       ),
       server: false,
       watch: [resolvedCourseId, overrideEnabled]

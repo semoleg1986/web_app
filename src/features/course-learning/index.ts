@@ -1,2 +1,7 @@
-export { useStudentCourseProgressQuery } from "~/features/course-learning/api/use-student-course-progress-query";
-export type { StudentCourseProgressSnapshot } from "~/features/course-learning/model/types";
+export { useStudentCourseLearningQuery } from "~/features/course-learning/api/use-student-course-learning-query";
+export type {
+  StudentCourseLearningLessonSnapshot,
+  StudentCourseLearningModuleSnapshot,
+  StudentCourseLearningProgressSnapshot,
+  StudentCourseLearningSnapshot
+} from "~/features/course-learning/model/types";

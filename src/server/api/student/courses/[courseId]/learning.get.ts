@@ -4,7 +4,7 @@ import {
   resolveServiceBaseUrl,
   unauthorizedProblem
 } from "~/server/utils/upstream-proxy";
-import type { StudentCourseProgressSnapshot } from "~/features/course-learning";
+import type { StudentCourseLearningSnapshot } from "~/features/course-learning";
 
 export default defineEventHandler(async (event) => {
   const runtimeConfig = useRuntimeConfig();
@@ -19,11 +19,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: "Course id is required" });
   }
 
-  return await proxyJsonRequest<StudentCourseProgressSnapshot>(event, {
+  return await proxyJsonRequest<StudentCourseLearningSnapshot>(event, {
     headers,
     method: "GET",
     url:
       `${resolveServiceBaseUrl(runtimeConfig.courseServiceBaseUrl, "http://localhost:8001")}` +
-      `/v1/student/courses/${courseId}/progress`
+      `/v1/student/courses/${courseId}/learning`
   });
 });
