@@ -5,6 +5,7 @@ import { useCookie } from "#app";
 import { useAuthSession } from "~/features/auth";
 import { useStudentCourseAccessQuery } from "~/features/course-access";
 import type { CourseDetailsItem } from "~/features/course-catalog";
+import { useStudentCourseProgressQuery } from "~/features/course-learning";
 import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
@@ -99,6 +100,15 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       studentCourseAccess.value?.decision === "allow" &&
       studentCourseAccess.value.grant_status === "approved"
   );
+  const studentCourseProgressEnabled = computed(
+    () => studentAccessEnabled.value && studentHasCourseAccess.value
+  );
+  const {
+    data: studentCourseProgressData,
+    pending: studentCourseProgressPending,
+    refresh: refreshStudentCourseProgress
+  } = useStudentCourseProgressQuery(courseKey, studentCourseProgressEnabled);
+  const studentCourseProgress = computed(() => studentCourseProgressData.value ?? null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
   const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
   const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
@@ -220,6 +230,13 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       },
       { immediate: true }
     );
+
+    watch(studentHasCourseAccess, (hasAccess) => {
+      if (!hasAccess) {
+        return;
+      }
+      void refreshStudentCourseProgress();
+    });
 
     onBeforeUnmount(() => {
       stopRefreshPolling();
@@ -381,11 +398,14 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     paymentIntent,
     purchasedOffer,
     refreshStudentCourseAccess,
+    refreshStudentCourseProgress,
     selectedStudentId,
     selectedOffer,
     showCreateStudentForm,
     studentCourseAccess,
     studentCourseAccessPending,
+    studentCourseProgress,
+    studentCourseProgressPending,
     studentHasCourseAccess,
     students,
     updateCreateStudentField,

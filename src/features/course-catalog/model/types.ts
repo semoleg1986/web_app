@@ -37,8 +37,15 @@ export interface CourseCardItem {
   title: string;
 }
 
+export interface CourseModuleItem {
+  lessonsCount: number;
+  moduleId: string;
+  title: string;
+}
+
 export interface CourseDetailsItem extends CourseCardItem {
   defaultOffer: CourseOfferItem | null;
   description: string;
+  modules: CourseModuleItem[];
   offers: CourseOfferItem[];
 }

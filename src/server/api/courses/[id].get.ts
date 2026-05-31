@@ -12,6 +12,11 @@ interface UpstreamPublicCourseDetails {
   description: string | null;
   lessons_total: number;
   level: string;
+  modules: Array<{
+    lessons_count: number;
+    module_id: string;
+    title: string;
+  }>;
   slug: string;
   title: string;
 }
@@ -132,6 +137,13 @@ export default defineEventHandler(async (event) => {
       id: resolveCourseRouteId(course.slug, course.course_id),
       lessonsCount: course.lessons_total,
       level: course.level,
+      modules: Array.isArray(course.modules)
+        ? course.modules.map((module) => ({
+            lessonsCount: module.lessons_count,
+            moduleId: module.module_id,
+            title: module.title
+          }))
+        : [],
       offers: normalizedOffers,
       title: course.title
     }
