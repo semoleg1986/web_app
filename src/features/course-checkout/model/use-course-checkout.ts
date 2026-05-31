@@ -4,7 +4,6 @@ import { useCookie } from "#app";
 
 import { useAuthSession } from "~/features/auth";
 import type { CourseDetailsItem } from "~/features/course-catalog";
-import { useStudentCourseLearningQuery } from "~/features/course-learning";
 import { useParentStudentsCommands, useParentStudentsQuery } from "~/features/parent-students";
 import type { ParentStudentItem } from "~/features/parent-students";
 import { useCheckoutStateQuery, usePaymentsCommands } from "~/features/payments";
@@ -12,7 +11,6 @@ import { ApiRequestError } from "~/shared/api/types";
 import { useSseChannel } from "~/shared/lib/realtime/use-sse-channel";
 
 const CHECKOUT_REFRESH_POLL_INTERVAL_MS = 5000;
-const STUDENT_ACCESS_POLL_INTERVAL_MS = 5000;
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const paymentsCommands = usePaymentsCommands();
@@ -23,13 +21,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const isStudent = computed(() => Boolean(user.value?.roles.includes("student")));
   const courseKey = computed(() => course.value.courseId);
   const studentsEnabled = computed(() => Boolean(isAuthenticated.value && isParent.value));
-  const studentLearningEnabled = computed(
-    () =>
-      initialized.value &&
-      isAuthenticated.value &&
-      isStudent.value &&
-      courseKey.value.trim().length > 0
-  );
   const currentParentUserId = computed(() => user.value?.user_id ?? "");
   const {
     data: studentsData,
@@ -59,7 +50,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const sseRefreshQueued = ref(false);
   const streamFallbackMode = ref(false);
   let refreshPollTimer: ReturnType<typeof setInterval> | null = null;
-  let studentAccessPollTimer: ReturnType<typeof setInterval> | null = null;
 
   const canCreateStudent = computed(
     () =>
@@ -80,13 +70,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     courseKey,
     checkoutStateEnabled
   );
-  const {
-    apiError: studentCourseLearningError,
-    data: studentCourseLearningData,
-    pending: studentCourseLearningPending,
-    refresh: refreshStudentCourseLearning
-  } = useStudentCourseLearningQuery(courseKey, studentLearningEnabled);
-
   const streamUrl = computed(() =>
     checkoutStateEnabled.value
       ? `/api/parent/payments/students/${selectedStudentId.value}/courses/${courseKey.value}/checkout-state/stream`
@@ -94,11 +77,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   );
 
   const checkoutState = computed(() => checkoutStateData.value ?? null);
-  const studentCourseLearning = computed(() => studentCourseLearningData.value ?? null);
-  const studentLearningDenied = computed(
-    () => studentCourseLearningError.value?.statusCode === 403
-  );
-  const studentHasCourseAccess = computed(() => studentCourseLearning.value !== null);
   const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
   const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
   const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
@@ -154,23 +132,6 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     }, CHECKOUT_REFRESH_POLL_INTERVAL_MS);
   }
 
-  function stopStudentAccessPolling() {
-    if (studentAccessPollTimer !== null) {
-      clearInterval(studentAccessPollTimer);
-      studentAccessPollTimer = null;
-    }
-  }
-
-  function startStudentAccessPolling() {
-    if (studentAccessPollTimer !== null) {
-      return;
-    }
-
-    studentAccessPollTimer = setInterval(() => {
-      void refreshStudentCourseLearning();
-    }, STUDENT_ACCESS_POLL_INTERVAL_MS);
-  }
-
   if (import.meta.client) {
     watch(streamUrl, (nextUrl) => {
       if (nextUrl) {
@@ -203,27 +164,8 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       stopRefreshPolling();
     });
 
-    watch(
-      [studentLearningEnabled, studentLearningDenied, studentHasCourseAccess],
-      ([enabled, denied, hasAccess]) => {
-        if (!enabled || hasAccess) {
-          stopStudentAccessPolling();
-          return;
-        }
-
-        if (denied) {
-          startStudentAccessPolling();
-          return;
-        }
-
-        stopStudentAccessPolling();
-      },
-      { immediate: true }
-    );
-
     onBeforeUnmount(() => {
       stopRefreshPolling();
-      stopStudentAccessPolling();
     });
   }
 
@@ -380,13 +322,9 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     nextAction,
     paymentIntent,
     purchasedOffer,
-    refreshStudentCourseLearning,
     selectedStudentId,
     selectedOffer,
     showCreateStudentForm,
-    studentCourseLearning,
-    studentCourseLearningPending,
-    studentHasCourseAccess,
     students,
     updateCreateStudentField,
     user
