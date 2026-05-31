@@ -36,26 +36,28 @@
       </div>
     </div>
 
-    <div
-      v-if="authPanelOpen && !user"
-      class="auth-modal"
-      role="dialog"
-      aria-modal="true"
-      :aria-label="t('auth.panel.label')"
-      @click.self="closePanel"
-    >
-      <div class="auth-modal__content" @click.stop>
-        <button
-          type="button"
-          class="auth-modal__close"
-          :aria-label="t('auth.modal.close')"
-          @click="closePanel"
-        >
-          ×
-        </button>
-        <AuthPanel :mode-value="authPanelMode" @close="closePanel" />
+    <Teleport to="body">
+      <div
+        v-if="authPanelOpen && !user"
+        class="auth-modal"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="t('auth.panel.label')"
+        @click.self="closePanel"
+      >
+        <div class="auth-modal__content" @click.stop>
+          <button
+            type="button"
+            class="auth-modal__close"
+            :aria-label="t('auth.modal.close')"
+            @click="closePanel"
+          >
+            ×
+          </button>
+          <AuthPanel :mode-value="authPanelMode" @close="closePanel" />
+        </div>
       </div>
-    </div>
+    </Teleport>
   </header>
 </template>
 
@@ -185,6 +187,7 @@ onBeforeUnmount(() => {
 }
 
 .auth-modal {
+  --auth-modal-top: 4.5rem;
   position: fixed;
   inset: var(--auth-modal-top) 0 0;
   z-index: 60;
@@ -218,7 +221,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
-  .header {
+  .auth-modal {
     --auth-modal-top: 8.25rem;
   }
 
