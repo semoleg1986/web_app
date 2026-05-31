@@ -27,7 +27,7 @@ export function useStudentCourseLearning(courseId: Ref<string>) {
   const learning = computed(() => data.value ?? null);
   const denied = computed(() => apiError.value?.statusCode === 403);
   const hasAccess = computed(() => learning.value !== null);
-  const shouldPoll = computed(() => enabled.value && !hasAccess.value && !pending.value);
+  const shouldPoll = computed(() => enabled.value && !hasAccess.value);
   const progressPercent = computed(() => {
     const rawPercent = learning.value?.progress.progress_percent ?? 0;
     return Math.min(100, Math.max(0, Math.round(rawPercent)));
@@ -49,6 +49,10 @@ export function useStudentCourseLearning(courseId: Ref<string>) {
     }
 
     pollTimer = setInterval(() => {
+      if (pending.value) {
+        return;
+      }
+
       void refresh();
     }, STUDENT_LEARNING_POLL_INTERVAL_MS);
   }
