@@ -11,14 +11,17 @@ export function useParentStudentsQuery(
   const resolvedEnabled = computed(() => Boolean(toValue(enabled)));
   const resolvedParentUserId = computed(() => toValue(parentUserId)?.trim() || "");
 
-  return useApiQuery<ParentStudentListResponse>("/parent/me/students", {
-    immediate: resolvedEnabled,
-    key: computed(() =>
-      resolvedEnabled.value
-        ? `GET:/parent/me/students:${resolvedParentUserId.value || "__anonymous__"}`
-        : "GET:/parent/me/students:__disabled__"
-    ),
-    server: resolvedEnabled,
-    watch: [resolvedEnabled, resolvedParentUserId]
-  });
+  return useApiQuery<ParentStudentListResponse>(
+    computed(() => (resolvedEnabled.value ? "/parent/me/students" : null)),
+    {
+      immediate: resolvedEnabled,
+      key: computed(() =>
+        resolvedEnabled.value
+          ? `GET:/parent/me/students:${resolvedParentUserId.value || "__anonymous__"}`
+          : "GET:/parent/me/students:__disabled__"
+      ),
+      server: resolvedEnabled,
+      watch: [resolvedEnabled, resolvedParentUserId]
+    }
+  );
 }
