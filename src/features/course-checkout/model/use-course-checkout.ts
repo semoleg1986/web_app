@@ -12,6 +12,7 @@ import { ApiRequestError } from "~/shared/api/types";
 import { useSseChannel } from "~/shared/lib/realtime/use-sse-channel";
 
 const CHECKOUT_REFRESH_POLL_INTERVAL_MS = 5000;
+const STUDENT_ACCESS_POLL_INTERVAL_MS = 5000;
 
 export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const paymentsCommands = usePaymentsCommands();
@@ -58,6 +59,7 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
   const sseRefreshQueued = ref(false);
   const streamFallbackMode = ref(false);
   let refreshPollTimer: ReturnType<typeof setInterval> | null = null;
+  let studentAccessPollTimer: ReturnType<typeof setInterval> | null = null;
 
   const canCreateStudent = computed(
     () =>
@@ -88,6 +90,21 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     checkoutStateEnabled.value
       ? `/api/parent/payments/students/${selectedStudentId.value}/courses/${courseKey.value}/checkout-state/stream`
       : ""
+  );
+
+  const checkoutState = computed(() => checkoutStateData.value ?? null);
+  const studentCourseAccess = computed(() => studentCourseAccessData.value ?? null);
+  const studentHasCourseAccess = computed(
+    () =>
+      studentCourseAccess.value?.decision === "allow" &&
+      studentCourseAccess.value.grant_status === "approved"
+  );
+  const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
+  const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
+  const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
+  const purchasedOffer = computed(() => checkoutState.value?.purchased_offer ?? null);
+  const nextAction = computed(
+    () => checkoutState.value?.available_actions.next_action ?? "create_payment_intent"
   );
 
   const isSseRefreshBlocked = computed(() => checkoutPending.value || createStudentPending.value);
@@ -137,6 +154,23 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
     }, CHECKOUT_REFRESH_POLL_INTERVAL_MS);
   }
 
+  function stopStudentAccessPolling() {
+    if (studentAccessPollTimer !== null) {
+      clearInterval(studentAccessPollTimer);
+      studentAccessPollTimer = null;
+    }
+  }
+
+  function startStudentAccessPolling() {
+    if (studentAccessPollTimer !== null) {
+      return;
+    }
+
+    studentAccessPollTimer = setInterval(() => {
+      void refreshStudentCourseAccess();
+    }, STUDENT_ACCESS_POLL_INTERVAL_MS);
+  }
+
   if (import.meta.client) {
     watch(streamUrl, (nextUrl) => {
       if (nextUrl) {
@@ -169,25 +203,29 @@ export function useCourseCheckout(course: Ref<CourseDetailsItem>) {
       stopRefreshPolling();
     });
 
+    watch(
+      [studentAccessEnabled, studentCourseAccess, studentHasCourseAccess],
+      ([enabled, access, hasAccess]) => {
+        if (!enabled || hasAccess) {
+          stopStudentAccessPolling();
+          return;
+        }
+
+        if (access?.decision === "deny") {
+          startStudentAccessPolling();
+          return;
+        }
+
+        stopStudentAccessPolling();
+      },
+      { immediate: true }
+    );
+
     onBeforeUnmount(() => {
       stopRefreshPolling();
+      stopStudentAccessPolling();
     });
   }
-
-  const checkoutState = computed(() => checkoutStateData.value ?? null);
-  const studentCourseAccess = computed(() => studentCourseAccessData.value ?? null);
-  const studentHasCourseAccess = computed(
-    () =>
-      studentCourseAccess.value?.decision === "allow" &&
-      studentCourseAccess.value.grant_status === "approved"
-  );
-  const paymentIntent = computed(() => checkoutState.value?.latest_payment_intent ?? null);
-  const accessGrant = computed(() => checkoutState.value?.access_grant ?? null);
-  const selectedOffer = computed(() => checkoutState.value?.selected_offer ?? null);
-  const purchasedOffer = computed(() => checkoutState.value?.purchased_offer ?? null);
-  const nextAction = computed(
-    () => checkoutState.value?.available_actions.next_action ?? "create_payment_intent"
-  );
 
   watch(
     students,
