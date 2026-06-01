@@ -24,8 +24,12 @@ export function useStudentCourseLearning(courseId: Ref<string>) {
     refresh
   } = useStudentCourseLearningQuery(courseId, enabled);
 
-  const learning = computed(() => data.value ?? null);
-  const denied = computed(() => apiError.value?.statusCode === 403);
+  const learning = computed(() =>
+    data.value?.access_state === "granted" ? data.value : null
+  );
+  const denied = computed(
+    () => data.value?.access_state === "denied" || apiError.value?.statusCode === 403
+  );
   const hasAccess = computed(() => learning.value !== null);
   const shouldPoll = computed(() => enabled.value && !hasAccess.value);
   const progressPercent = computed(() => {

@@ -28,6 +28,7 @@ export interface StudentCourseLearningModuleSnapshot {
 }
 
 export interface StudentCourseLearningSnapshot {
+  access_state: "granted";
   course_id: string;
   description: string | null;
   level: string;
@@ -36,3 +37,13 @@ export interface StudentCourseLearningSnapshot {
   progress: StudentCourseLearningProgressSnapshot;
   title: string;
 }
+
+export interface StudentCourseLearningDeniedSnapshot {
+  access_state: "denied";
+  course_id: string;
+  detail: string;
+}
+
+export type StudentCourseLearningState =
+  | StudentCourseLearningDeniedSnapshot
+  | StudentCourseLearningSnapshot;

@@ -2,7 +2,7 @@ import { computed, toValue } from "vue";
 import type { MaybeRefOrGetter } from "vue";
 
 import { useApiQuery } from "~/shared/api/use-api-query";
-import type { StudentCourseLearningSnapshot } from "~/features/course-learning/model/types";
+import type { StudentCourseLearningState } from "~/features/course-learning/model/types";
 
 export function useStudentCourseLearningQuery(
   courseId: MaybeRefOrGetter<string | null | undefined>,
@@ -12,7 +12,7 @@ export function useStudentCourseLearningQuery(
   const overrideEnabled = computed(() => Boolean(toValue(enabledOverride)));
   const enabled = computed(() => overrideEnabled.value && resolvedCourseId.value.length > 0);
 
-  return useApiQuery<StudentCourseLearningSnapshot>(
+  return useApiQuery<StudentCourseLearningState>(
     computed(() =>
       enabled.value ? `/student/courses/${resolvedCourseId.value}/learning` : null
     ),
