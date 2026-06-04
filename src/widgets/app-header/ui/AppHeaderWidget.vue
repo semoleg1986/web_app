@@ -190,22 +190,16 @@ onBeforeUnmount(() => {
   inset: 0;
   z-index: 110;
   display: grid;
-  place-items: center;
-  padding: clamp(5.75rem, 10vh, 7rem) 1rem 1.25rem;
-  background:
-    radial-gradient(
-      circle at 50% 12%,
-      color-mix(in srgb, var(--c-accent) 18%, transparent),
-      transparent 34%
-    ),
-    color-mix(in srgb, var(--c-bg) 72%, #02070a 28%);
-  backdrop-filter: blur(10px);
+  place-items: start center;
+  padding: clamp(7rem, 16vh, 10rem) 1rem 1.25rem;
+  background: color-mix(in srgb, var(--c-bg) 78%, #02070a 22%);
+  backdrop-filter: blur(7px);
   overflow-y: auto;
 }
 
 .auth-modal__content {
   width: min(100%, 25rem);
-  max-height: calc(100dvh - 7rem);
+  max-height: calc(100dvh - clamp(8rem, 18vh, 11rem));
   position: relative;
   display: grid;
   align-items: start;
