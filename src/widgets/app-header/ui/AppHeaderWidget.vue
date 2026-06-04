@@ -192,8 +192,8 @@ onBeforeUnmount(() => {
   display: grid;
   place-items: start center;
   padding: clamp(7rem, 16vh, 10rem) 1rem 1.25rem;
-  background: color-mix(in srgb, var(--c-bg) 90%, #02070a 10%);
-  backdrop-filter: blur(4px);
+  background: rgb(15 21 25 / 0.08);
+  backdrop-filter: blur(2px);
   overflow-y: auto;
 }
 
