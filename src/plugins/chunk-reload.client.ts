@@ -1,3 +1,5 @@
+import { defineNuxtPlugin } from "#app";
+
 const reloadStorageKey = "curs:chunk-reload-at";
 const reloadCooldownMs = 30_000;
 

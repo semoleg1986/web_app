@@ -107,10 +107,9 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .header {
-  --auth-modal-top: 4.5rem;
   position: sticky;
   top: 0;
-  z-index: 70;
+  z-index: 120;
   backdrop-filter: blur(12px);
   background: color-mix(in srgb, var(--c-bg) 86%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--c-border) 84%, transparent);
@@ -187,22 +186,29 @@ onBeforeUnmount(() => {
 }
 
 .auth-modal {
-  --auth-modal-top: 4.5rem;
   position: fixed;
-  inset: var(--auth-modal-top) 0 0;
-  z-index: 60;
+  inset: 0;
+  z-index: 110;
   display: grid;
-  place-items: start center;
-  padding: 1rem;
-  background: color-mix(in srgb, var(--c-bg) 30%, #02070a 70%);
-  backdrop-filter: blur(8px);
+  place-items: center;
+  padding: clamp(5.75rem, 10vh, 7rem) 1rem 1.25rem;
+  background:
+    radial-gradient(
+      circle at 50% 12%,
+      color-mix(in srgb, var(--c-accent) 18%, transparent),
+      transparent 34%
+    ),
+    color-mix(in srgb, var(--c-bg) 72%, #02070a 28%);
+  backdrop-filter: blur(10px);
   overflow-y: auto;
 }
 
 .auth-modal__content {
   width: min(100%, 25rem);
-  max-height: calc(100dvh - var(--auth-modal-top) - 2rem);
+  max-height: calc(100dvh - 7rem);
   position: relative;
+  display: grid;
+  align-items: start;
 }
 
 .auth-modal__close {
@@ -221,10 +227,6 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 720px) {
-  .auth-modal {
-    --auth-modal-top: 8.25rem;
-  }
-
   .header__main,
   .header__guest,
   .header__session {
@@ -249,16 +251,16 @@ onBeforeUnmount(() => {
 
 @media (max-width: 767px) {
   .header {
-    position: relative;
+    position: sticky;
   }
 
   .auth-modal {
-    align-items: end;
-    padding: 0.75rem;
+    place-items: end center;
+    padding: 5.75rem 0.75rem 0.75rem;
   }
 
   .auth-modal__content {
-    max-height: calc(100dvh - var(--auth-modal-top) - 1.5rem);
+    max-height: calc(100dvh - 6.5rem);
     overflow-y: auto;
   }
 }

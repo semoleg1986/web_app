@@ -38,6 +38,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from "#app";
 import { reactive, ref, computed } from "vue";
 
 import { useAuthSession } from "~/features/auth";
